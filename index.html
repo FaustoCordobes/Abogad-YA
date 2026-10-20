@@ -165,7 +165,7 @@ p{margin:0}
 .original s{text-decoration-color:var(--lacre);text-decoration-thickness:2px}
 
 /* ---------- Mazo de tarjetas ---------- */
-.mazo{position:relative;height:452px;margin-top:6px}
+.mazo{position:relative;height:476px;margin-top:6px}
 .carta{
   position:absolute;inset:0;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-grande);
   padding:20px;display:flex;flex-direction:column;touch-action:pan-y;user-select:none;
@@ -281,6 +281,33 @@ a.item strong{color:var(--lacre);font-size:20px}
 /* ---------- Toast ---------- */
 .toast{position:absolute;left:16px;right:16px;top:150px;box-shadow:0 12px 24px -12px rgba(24,35,58,.5);background:var(--tinta);color:#fff;border-radius:14px;padding:12px 16px;font-size:14.5px;z-index:30;animation:subir .2s ease}
 
+/* ---------- Fotos y estrellas ---------- */
+.foto{display:block;width:64px;height:64px;border-radius:18px;overflow:hidden;flex:none;background:var(--papel-2)}
+.foto svg,.foto img{width:100%;height:100%;display:block;object-fit:cover}
+.foto.g{width:76px;height:76px;border-radius:22px}
+.foto.m{width:44px;height:44px;border-radius:13px}
+.foto.s{width:40px;height:40px;border-radius:12px}
+.estrellas{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--tinta-2);flex-wrap:wrap}
+.estrellas strong{color:var(--tinta)}
+.fila-e{position:relative;display:inline-block;line-height:0;white-space:nowrap}
+.fila-e .llenas{position:absolute;top:0;left:0;bottom:0;overflow:hidden;white-space:nowrap}
+.fila-e svg{width:16px;height:16px;margin-right:2px}
+.fila-e.g svg{width:22px;height:22px}
+.fila-e .vacias path{fill:#D7DBE5}
+.fila-e .llenas path{fill:#C98A12}
+.selector-estrellas{display:flex;gap:4px}
+.selector-estrellas button{background:none;border:0;padding:4px;border-radius:10px}
+.selector-estrellas svg{width:44px;height:44px;display:block}
+.selector-estrellas path{fill:#D7DBE5}
+.selector-estrellas button.on path{fill:#C98A12}
+.resena .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.resena .tipo{font-weight:600;font-size:14.5px;margin:6px 0 4px}
+.subir-foto{display:flex;gap:12px;align-items:center}
+.pendiente-res{background:var(--alerta-claro);border:1px solid #EBCB8B;border-radius:var(--r-medio);padding:14px}
+.match .pareja>*+*{margin-left:-14px}
+.match .pareja .foto{border:4px solid var(--papel)}
+.match .pareja .avatar{font-size:20px}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
@@ -363,6 +390,29 @@ const ABOGADOS = [
   {id:'a6',nombre:'Dr. Hernán Ibarra',ini:'HI',colegio:'Colegio de Abogados de Rosario',corto:'CAR',mat:'T° LV F° 21',juris:'Santa Fe (Rosario)',anios:11,temas:['negocio','deudas','trabajo'],esp:[['Derecho comercial',true],['Derecho laboral',false]],modo:'Video y presencial',consulta:'$ 42.000',resp:'7 h',rep:[4.5,4.6,4.4,4.7],resenas:14,acepta:false,verif:'01/10/2026',bio:'Pymes y comercios: contratos, conflictos entre socios y cobranzas. También despidos del lado del trabajador.'},
   {id:'a7',nombre:'Dra. Rocío Medina',ini:'RM',colegio:'Colegio Público de la Abogacía de la Capital Federal',corto:'CPACF',mat:'T° 102 F° 640',juris:'Ciudad de Buenos Aires',anios:12,temas:['accidentes','deudas','herencias'],esp:[['Daños y perjuicios',true],['Seguros',true]],modo:'Video y presencial',consulta:'$ 45.000',resp:'3 h',rep:[4.8,4.7,4.8,4.9],resenas:28,acepta:true,verif:'14/10/2026',bio:'Accidentes de tránsito, reclamos a aseguradoras y daños. Te digo qué documentación juntar desde el primer día.'}
 ];
+ABOGADOS.push(
+  {id:'a8',nombre:'Dr. Tomás Aguirre',ini:'TA',colegio:'Colegio Público de la Abogacía de la Capital Federal',corto:'CPACF',mat:'T° 154 F° 233',juris:'Ciudad de Buenos Aires',anios:7,temas:['trabajo','nose'],esp:[['Derecho laboral',true],['Seguridad social',false]],modo:'Video y presencial',consulta:'$ 45.000',resp:'5 h',rep:[4.6,4.6,4.6,4.6],resenas:6,acepta:true,verif:'20/10/2026',bio:'Trabajo con despidos y reclamos laborales. Te explico los pasos y los costos antes de empezar.'},
+  {id:'e1',tipo:'estudio',nombre:'Torres, Giménez y Asociados',ini:'TG',colegio:'CPACF y Colegio de Abogados de San Isidro',corto:'ESTUDIO',mat:'3 abogados verificados',juris:'Ciudad de Buenos Aires y San Isidro',anios:15,temas:['trabajo','alquiler','familia','deudas'],esp:[['Laboral',true],['Civil y alquileres',true],['Familia',false]],modo:'Video y presencial',consulta:'$ 48.000',resp:'3 h',rep:[4.7,4.7,4.7,4.7],resenas:52,acepta:true,verif:'18/10/2026',caras:['m1','m2','m3'],responsables:['Dra. Ana Torres, CPACF T° 95 F° 310','Dr. Pablo Giménez, CASI T° X F° 12'],bio:'Estudio con equipo laboral, civil y de familia. Cada caso tiene un abogado responsable con nombre y matrícula.'},
+  {id:'e2',tipo:'estudio',nombre:'Paz & Molina Abogados',ini:'PM',colegio:'Colegio de Abogados y Procuradores de Neuquén',corto:'ESTUDIO',mat:'4 abogados verificados',juris:'Neuquén',anios:9,temas:['herencias','accidentes','familia','negocio'],esp:[['Sucesiones',true],['Daños',true],['Comercial',false]],modo:'Video y presencial',consulta:'$ 42.000',resp:'8 h',rep:[4.5,4.5,4.5,4.5],resenas:19,acepta:false,verif:'11/10/2026',caras:['n1','n2','n3'],responsables:['Dra. Inés Paz, CAPN Mat. 2.105','Dr. Bruno Molina, CAPN Mat. 2.877'],bio:'Sucesiones, accidentes y empresas familiares en Neuquén. Atendemos por video en toda la provincia.'}
+);
+const CARAS = {
+  a1:{piel:'#E8B896',pelo:'#4A3020',estilo:'largo',ropa:'#18233A',fondo:'#DCE3EF'},
+  a2:{piel:'#D29C74',pelo:'#2B1D14',estilo:'corto',ropa:'#5B6B7F',fondo:'#E4E0D6'},
+  a3:{piel:'#F2CDB0',pelo:'#B98B4E',estilo:'ondulado',ropa:'#8E2A3B',fondo:'#EAE3EE'},
+  a4:{piel:'#C68A5E',pelo:'#9AA0A6',estilo:'calvo',ropa:'#2F3B4F',fondo:'#DDE6E1'},
+  a5:{piel:'#8D5A3B',pelo:'#1C1C1C',estilo:'rodete',ropa:'#2C7A57',fondo:'#F0E4D8'},
+  a6:{piel:'#E0AC80',pelo:'#3A2A1E',estilo:'corto',ropa:'#6E1F2D',fondo:'#E1E6EF'},
+  a7:{piel:'#C99067',pelo:'#2B1D14',estilo:'largo',ropa:'#4B5568',fondo:'#E9E1DA'},
+  a8:{piel:'#EDC1A0',pelo:'#5A3A22',estilo:'corto',ropa:'#18233A',fondo:'#E4E9E2'},
+  m1:{piel:'#F0C6A6',pelo:'#7A5230',estilo:'largo',ropa:'#18233A',fondo:'#E7E0EA'},
+  m2:{piel:'#D9A57E',pelo:'#1C1C1C',estilo:'corto',ropa:'#4B5568',fondo:'#DFE7EC'},
+  m3:{piel:'#B97A52',pelo:'#2B1D14',estilo:'rodete',ropa:'#8E2A3B',fondo:'#EFE6DA'},
+  n1:{piel:'#E6B48F',pelo:'#2B1D14',estilo:'largo',ropa:'#2C7A57',fondo:'#E3E8E4'},
+  n2:{piel:'#C68A5E',pelo:'#3A2A1E',estilo:'corto',ropa:'#18233A',fondo:'#E3E8E4'},
+  n3:{piel:'#F0C6A6',pelo:'#9AA0A6',estilo:'calvo',ropa:'#5B6B7F',fondo:'#E3E8E4'}
+};
+const TIPOS_CASO = ['Trabajo','Familia','Alquiler y vivienda','Deudas y consumo','Accidentes y daños','Herencias','Penal','Mi negocio'];
+const CONSTANCIAS = ['Convenio de honorarios','Recibo o factura del profesional','Número de expediente'];
 const RESENAS = [
   ['Me explicó todo sin palabras raras y me pasó el presupuesto por escrito antes de empezar.','Gracias. Siempre trabajo así.'],
   ['Respondió rápido y cumplió con lo que habíamos acordado.',null]
@@ -393,8 +443,8 @@ const HORARIOS = ['Jueves 10:00 por video','Jueves 18:30 por video','Viernes 12:
    ========================================================= */
 function estadoInicial(){
   return {
-    rol:'cliente',
-    cliente:{vista:'inicio',paso:0,caso:null,borrador:nuevoBorrador(),consentSens:false,consentTyc:false,tel:'',otpEnviado:false,likes:5,indice:0,orden:null,pendientes:[],chats:[],chatAbierto:null},
+    rol:'cliente', fotos:{}, resenas:{}, replicas:{}, pendRes:pendInicial(),
+    cliente:{registro:null,cal:null,vista:'inicio',paso:0,caso:null,borrador:nuevoBorrador(),consentSens:false,consentTyc:false,tel:'',otpEnviado:false,likes:5,indice:0,orden:null,pendientes:[],chats:[],chatAbierto:null},
     abogado:{vista:'casos',verificado:false,indice:0,ayudados:[],chats:[],chatAbierto:null,plan:'basico',cupo:5,honorario:'45000',bio:'Trabajo con despidos y reclamos laborales. Te explico los pasos y los costos antes de empezar.',cuotaLitis:false},
     estudio:{vista:'bandeja',asignaciones:{},descartados:[],ayudados:[],chats:[],chatAbierto:null,equipo:[
       {id:'m1',nombre:'Dra. Ana Torres',ini:'AT',rol:'Socia',mat:'CPACF T° 95 F° 310',esp:'Laboral',estado:'ok'},
@@ -415,9 +465,9 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const temaLabel = id => (TEMAS.find(t=>t.id===id)||{}).label || '';
 const abogado = id => ABOGADOS.find(a=>a.id===id);
 
-function seal(corto, pendiente){
+function seal(corto, pendiente, texto){
   const id = 'sello' + (++sealN);
-  const txt = pendiente ? 'EN VERIFICACIÓN · ' + corto + ' · ' : 'MATRÍCULA VERIFICADA · ' + corto + ' · ';
+  const txt = texto ? texto : pendiente ? 'EN VERIFICACIÓN · ' + corto + ' · ' : 'MATRÍCULA VERIFICADA · ' + corto + ' · ';
   return `<svg class="seal${pendiente?' pendiente':''}" viewBox="0 0 100 100" aria-hidden="true">
     <defs><path id="${id}" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs>
     <circle cx="50" cy="50" r="48" class="anillo"/>
@@ -463,8 +513,9 @@ function esUrgente(b){
   return false;
 }
 function ordenJusto(tema){
-  const afines = ABOGADOS.filter(a=>a.temas.includes(tema));
-  const resto = ABOGADOS.filter(a=>!a.temas.includes(tema));
+  const lista = visibles();
+  const afines = lista.filter(a=>a.temas.includes(tema));
+  const resto = lista.filter(a=>!a.temas.includes(tema));
   const mezclar = arr => arr.map(a=>[Math.random(),a]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
   return [...mezclar(afines), ...mezclar(resto)].map(a=>a.id);
 }
@@ -475,6 +526,180 @@ function toast(msg){
   const el = document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.textContent = msg;
   capa.appendChild(el);
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.remove(), 3200);
+}
+
+/* =========================================================
+   Fotos, estrellas y reseñas
+   ========================================================= */
+function matDe(p){ return p.id==='e1' ? S.estudio.equipo.filter(m=>m.estado==='ok').length+' abogados verificados' : p.mat; }
+function responsablesDe(p){ return p.id==='e1' ? S.estudio.equipo.filter(m=>m.estado==='ok').map(m=>m.nombre+', '+m.mat) : p.responsables; }
+function visibles(){ return ABOGADOS.filter(a => a.id!=='a8' || S.abogado.verificado); }
+function caraPor(id){
+  if (CARAS[id]) return CARAS[id];
+  const h = [...id].reduce((x,ch)=>x+ch.charCodeAt(0),0);
+  const pieles=['#F1C7A5','#E0AC80','#C68A5E','#8D5A3B'], pelos=['#2B1D14','#4A3020','#B98B4E','#1C1C1C'], estilos=['corto','largo','ondulado','rodete'];
+  return {piel:pieles[h%4],pelo:pelos[(h>>1)%4],estilo:estilos[(h>>2)%4],ropa:'#4B5568',fondo:'#E4E7EE'};
+}
+function retratoInner(c){
+  let s = '';
+  if (c.estilo==='largo') s += `<path d="M17 30 C15 12 49 12 47 30 L49 52 L15 52 Z" fill="${c.pelo}"/>`;
+  if (c.estilo==='ondulado') s += `<path d="M18 32 C14 13 50 13 46 32 C48 36 46 41 43 41 L21 41 C18 41 16 36 18 32 Z" fill="${c.pelo}"/>`;
+  s += `<path d="M6 64 C8 51 20 46 32 46 C44 46 56 51 58 64 Z" fill="${c.ropa}"/>`;
+  s += `<rect x="27" y="36" width="10" height="12" rx="4" fill="${c.piel}"/>`;
+  s += `<ellipse cx="32" cy="29" rx="11.5" ry="13.5" fill="${c.piel}"/>`;
+  if (c.estilo==='corto' || c.estilo==='rodete') s += `<path d="M20.5 27 C19 13 45 13 43.5 27 C41 21 34 19.5 26 21.5 C23.5 22.5 21.5 24.5 20.5 27 Z" fill="${c.pelo}"/>`;
+  if (c.estilo==='rodete') s += `<circle cx="32" cy="12.5" r="5.5" fill="${c.pelo}"/>`;
+  if (c.estilo==='largo' || c.estilo==='ondulado') s += `<path d="M20.5 28 C19 13 45 13 43.5 28 C40 21 30 18.5 20.5 28 Z" fill="${c.pelo}"/>`;
+  if (c.estilo==='calvo') s += `<path d="M20.5 30 C20 25 21 22 22.5 21 L22.5 31 Z M43.5 30 C44 25 43 22 41.5 21 L41.5 31 Z" fill="${c.pelo}"/>`;
+  s += `<circle cx="27.5" cy="30" r="1.4" fill="#2A2420"/><circle cx="36.5" cy="30" r="1.4" fill="#2A2420"/>`;
+  s += `<path d="M28.5 35.5 Q32 38 35.5 35.5" stroke="#7A4A36" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  return s;
+}
+function retratoSVG(c){ return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${c.fondo}"/>${retratoInner(c)}</svg>`; }
+function grupoSVG(cs){
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${cs[0].fondo}"/>
+    <g transform="translate(-13 14) scale(.78)">${retratoInner(cs[1])}</g>
+    <g transform="translate(27 14) scale(.78)">${retratoInner(cs[2])}</g>
+    <g transform="translate(4.8 10) scale(.85)">${retratoInner(cs[0])}</g></svg>`;
+}
+function fotoDe(p, size){
+  if (!p) return '';
+  const url = S.fotos[p.id];
+  const inner = url ? `<img src="${url}" alt="">` : (p.tipo==='estudio' ? grupoSVG(p.caras.map(caraPor)) : retratoSVG(caraPor(p.id)));
+  return `<span class="foto ${size||''}" role="img" aria-label="Foto de ${esc(p.nombre)}">${inner}</span>`;
+}
+function fotoMiembro(m){ return `<span class="foto m" role="img" aria-label="Foto de ${esc(m.nombre)}">${retratoSVG(caraPor(m.id))}</span>`; }
+
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+const fmt = v => v.toFixed(1).replace('.',',');
+function estrellasHTML(v, cls){
+  return `<span class="fila-e ${cls||''}" role="img" aria-label="${fmt(v)} de 5 estrellas"><span class="vacias">${STAR.repeat(5)}</span><span class="llenas" style="width:${Math.max(0,Math.min(100,v/5*100))}%">${STAR.repeat(5)}</span></span>`;
+}
+function nuevasDe(id){ return S.resenas[id] || []; }
+function promedio(p){
+  const base = p.rep.reduce((x,y)=>x+y,0)/p.rep.length;
+  const nv = nuevasDe(p.id);
+  return (base*p.resenas + nv.reduce((x,r)=>x+r.e,0)) / (p.resenas + nv.length);
+}
+function cantidad(p){ return p.resenas + nuevasDe(p.id).length; }
+function estrellasResumen(p, cls){
+  const v = promedio(p);
+  return `<div class="estrellas" style="margin-top:8px">${estrellasHTML(v, cls)}<span><strong>${fmt(v)}</strong> · ${cantidad(p)} reseñas verificadas</span></div>`;
+}
+function muestras(p){
+  const tipos = p.temas.filter(t=>t!=='nose').map(temaLabel);
+  return [
+    {id:p.id+'-m0',e:5,tipo:tipos[0],fecha:'septiembre 2026',texto:RESENAS[0][0],replica:RESENAS[0][1]},
+    {id:p.id+'-m1',e:4,tipo:tipos[1]||tipos[0],fecha:'julio 2026',texto:RESENAS[1][0],replica:null}
+  ];
+}
+function resenasDe(p){
+  return [...nuevasDe(p.id), ...muestras(p)].map(r => ({...r, replica: S.replicas[r.id] || r.replica}));
+}
+function renderResena(r, propio){
+  return `<div class="resena">
+    <div class="meta">${estrellasHTML(r.e)}<span class="chip chip-ok">Caso verificado</span></div>
+    <p class="tipo">Caso de ${esc(r.tipo)} · ${esc(r.fecha)}</p>
+    ${r.texto?`<p>${esc(r.texto)}</p>`:''}
+    ${r.replica?`<div class="replica">Respuesta: ${esc(r.replica)}</div>`:''}
+    ${propio && !r.replica ? `<button class="btn-texto" data-action="responder-resena" data-id="${r.id}" style="margin-top:6px;font-size:14px">Responder</button>` : ''}
+  </div>`;
+}
+function bloqueResenasPropias(id){
+  const p = abogado(id), v = promedio(p);
+  const pend = S.pendRes.filter(x=>x.perfilId===id && x.estado==='pendiente');
+  const quien = p.tipo==='estudio' ? 'el estudio' : 'vos';
+  return `<section class="pila">
+    <h2 class="titulo-chico">Calificaciones</h2>
+    <div class="estrellas">${estrellasHTML(v,'g')}<span><strong>${fmt(v)}</strong> de 5 · ${cantidad(p)} reseñas verificadas</span></div>
+    ${pend.map(x=>`<div class="pendiente-res">
+      <strong>¿Fue ${p.tipo==='estudio'?'cliente del estudio':'tu cliente'}?</strong>
+      <p style="margin-top:4px;font-size:15px">${esc(x.nombre)} dice que tuvo un caso de ${esc(x.tipo)} con ${quien} en ${esc(x.anio)}. Adjuntó: ${esc(x.constTipo)}.</p>
+      <p class="texto-3" style="margin-top:4px">Confirmás solo que el caso existió. No ves la calificación antes de que se publique, y el público solo verá el tipo de caso.</p>
+      <div class="fila-btns" style="margin-top:10px"><button class="btn btn-sec" data-action="rechazar-caso" data-id="${x.id}">No reconozco</button><button class="btn btn-principal" data-action="confirmar-caso" data-id="${x.id}">Confirmo</button></div>
+    </div>`).join('')}
+    <div class="pila">${resenasDe(p).map(r=>renderResena(r,true)).join('')}</div>
+    <p class="texto-3">Solo califican personas registradas con nombre completo y DNI que acreditaron un caso con ${quien}. Las reseñas no se pueden borrar, pero sí responder.</p>
+  </section>`;
+}
+function pendInicial(){
+  return [
+    {id:'p0',perfilId:'a8',tipo:'Trabajo',anio:'2025',constTipo:'Convenio de honorarios',nombre:'Mariana López',estado:'pendiente',semilla:5},
+    {id:'p1',perfilId:'e1',tipo:'Alquiler y vivienda',anio:'2026',constTipo:'Número de expediente',nombre:'Diego Fernández',estado:'pendiente',semilla:4}
+  ];
+}
+
+/* ---------------- Calificar (persona) ---------------- */
+function vistaCalificar(){
+  const c = S.cliente, cal = c.cal, paso = cal.paso;
+  const p = cal.perfilId ? abogado(cal.perfilId) : null;
+  const barra = paso < 5 ? `<div><div class="progreso" aria-hidden="true">${[0,1,2,3,4].map(i=>`<span class="${i<=paso?'hecho':''}"></span>`).join('')}</div><p class="paso-de">Paso ${paso+1} de 5</p></div>` : '';
+  const cabPerfil = p ? `<div class="item">${fotoDe(p,'m')}<div class="cuerpo"><strong>${esc(p.nombre)}</strong><span>${p.tipo==='estudio'?'Estudio jurídico':esc(p.corto+' '+p.mat)}</span></div></div>` : '';
+  let cuerpo = '';
+  if (paso===0){
+    cuerpo = `<h1 class="titulo">Registrate para calificar</h1>
+      <p class="texto-2">Solo pueden calificar personas que tuvieron un caso real con el abogado o el estudio.</p>
+      <div class="campo"><label for="reg-nombre">Nombre completo</label><input id="reg-nombre" autocomplete="name" value="${esc(cal.regNombre||'')}" data-input="reg-nombre" placeholder="Como figura en tu DNI"></div>
+      <div class="campo"><label for="reg-dni">DNI</label><input id="reg-dni" inputmode="numeric" value="${esc(cal.regDni||'')}" data-input="reg-dni" placeholder="30.123.456"></div>
+      <label class="check"><input type="checkbox" id="reg-decl"><span>Declaro que mis datos son verdaderos y que tuve un caso real con el profesional que voy a calificar.</span></label>
+      <div class="aviso aviso-lacre">Tu DNI se usa solo para validar tu identidad y evitar que el mismo caso se califique dos veces. Nunca se publica. El abogado ve tu nombre solo para confirmar que fuiste su cliente.</div>
+      <div class="acciones-fijas fila-btns"><button class="btn btn-sec" data-action="tab" data-vista="inicio">Cancelar</button><button class="btn btn-principal" data-action="cal-registrar">Continuar</button></div>`;
+  }
+  if (paso===1){
+    cuerpo = `<h1 class="titulo">¿A quién querés calificar?</h1>
+      <p class="texto-3">Registrada como ${esc(c.registro.nombre)}, DNI terminado en ${esc(c.registro.dni.slice(-3))}.</p>
+      <div class="pila">${visibles().map(a=>`<button class="item" data-action="cal-perfil" data-id="${a.id}">${fotoDe(a,'m')}<div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>${a.tipo==='estudio'?'Estudio jurídico':esc(a.corto+' '+a.mat)}</span></div>${estrellasHTML(promedio(a))}</button>`).join('')}</div>
+      <div class="acciones-fijas"><button class="btn btn-sec btn-bloque" data-action="tab" data-vista="inicio">Cancelar</button></div>`;
+  }
+  if (paso===2){
+    const esExp = cal.constTipo==='Número de expediente';
+    cuerpo = `<h1 class="titulo">Contanos qué caso tuviste</h1>
+      ${cabPerfil}
+      <div class="campo"><label for="cal-tipo">Tipo de caso</label><select id="cal-tipo" data-input="cal-tipo"><option value="">Elegí el tipo de caso</option>${TIPOS_CASO.map(t=>`<option ${cal.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="campo"><label for="cal-anio">Año en que empezó</label><select id="cal-anio" data-input="cal-anio"><option value="">Elegí el año</option>${[2026,2025,2024,2023,2022,2021,2020,2019,2018].map(y=>`<option ${String(cal.anio)===String(y)?'selected':''}>${y}</option>`).join('')}</select></div>
+      <div><p class="pregunta">Constancia del caso</p><div class="opciones">${CONSTANCIAS.map(o=>`<button class="opcion" data-action="cal-const" data-valor="${esc(o)}" aria-pressed="${cal.constTipo===o}">${esc(o)}</button>`).join('')}</div></div>
+      ${cal.constTipo ? (esExp
+        ? `<div class="campo"><label for="cal-exp">Número de expediente</label><input id="cal-exp" data-input="cal-exp" value="${esc(cal.expediente||'')}" placeholder="Por ejemplo: 12345/2025"></div>`
+        : `<div class="subir-foto"><label class="btn btn-sec" for="cal-archivo" style="flex:1">${cal.archivo?'Cambiar archivo':'Adjuntar foto o PDF'}</label><input type="file" id="cal-archivo" class="sr" accept="image/*,application/pdf" data-input="constancia"></div>${cal.archivo?`<p class="ayuda">Adjuntaste: ${esc(cal.archivo)}</p>`:''}`) : ''}
+      <div class="aviso aviso-info">La constancia la revisa solo el equipo de verificación y se borra después de validarla. En tu reseña se publica únicamente el tipo de caso.</div>
+      <div class="acciones-fijas fila-btns"><button class="btn btn-sec" data-action="cal-atras">Volver</button><button class="btn btn-principal" data-action="cal-enviar">Enviar</button></div>`;
+  }
+  if (paso===3){
+    const pend = S.pendRes.find(x=>x.id===cal.pendId);
+    const propio = cal.perfilId==='a8' ? '«Soy abogado»' : cal.perfilId==='e1' ? '«Soy estudio»' : '';
+    if (pend.estado==='pendiente'){
+      cuerpo = `<h1 class="titulo">Esperando confirmación</h1>${cabPerfil}
+        <p class="texto-2">Le pedimos a ${esc(p.nombre)} que confirme que tuviste un caso de ${esc(pend.tipo)} en ${esc(pend.anio)}. No va a ver tu calificación antes de que se publique.</p>
+        <div class="aviso aviso-info">Si no responde en 7 días, una persona del equipo revisa tu constancia.</div>
+        ${propio?`<p class="texto-3">En la demo también podés cambiar a ${propio} y confirmarlo desde su perfil.</p>`:''}
+        <button class="btn btn-principal btn-bloque" data-action="cal-simular">Simular confirmación</button>`;
+    } else if (pend.estado==='confirmada'){
+      cuerpo = `<h1 class="titulo">Caso confirmado</h1>${cabPerfil}
+        <div class="aviso aviso-ok">${esc(p.nombre)} confirmó el caso. Ya podés calificar.</div>
+        <button class="btn btn-principal btn-bloque" data-action="cal-a-estrellas">Calificar ahora</button>`;
+    } else {
+      cuerpo = `<h1 class="titulo">Lo estamos revisando</h1>${cabPerfil}
+        <div class="aviso aviso-alerta">El profesional no reconoció el caso. Una persona del equipo va a revisar tu constancia y te avisamos.</div>
+        <button class="btn btn-sec btn-bloque" data-action="tab" data-vista="inicio">Volver al inicio</button>`;
+    }
+  }
+  if (paso===4){
+    cuerpo = `<h1 class="titulo">¿Cómo fue tu experiencia?</h1>${cabPerfil}
+      <div><p class="pregunta">Tu calificación</p>
+        <div class="selector-estrellas" role="radiogroup" aria-label="Calificación de 1 a 5 estrellas">${[1,2,3,4,5].map(n=>`<button role="radio" aria-checked="${cal.estrellas===n}" aria-label="${n} ${n===1?'estrella':'estrellas'}" class="${n<=cal.estrellas?'on':''}" data-action="cal-estrella" data-n="${n}">${STAR}</button>`).join('')}</div>
+        <p class="ayuda">${['Elegí de 1 a 5 estrellas','Muy mala','Mala','Regular','Buena','Excelente'][cal.estrellas]}</p></div>
+      <div class="campo"><label for="cal-texto">Comentario (opcional)</label><textarea id="cal-texto" maxlength="400" data-input="cal-texto" placeholder="Cómo te explicó, si respondió a tiempo, si cumplió lo acordado">${esc(cal.texto||'')}</textarea>
+        <p class="ayuda">No incluyas nombres ni detalles del caso. Ocultamos los datos personales automáticamente.</p></div>
+      <div class="acciones-fijas"><button class="btn btn-principal btn-bloque" data-action="cal-publicar">Publicar calificación</button></div>`;
+  }
+  if (paso===5){
+    const r = nuevasDe(cal.perfilId)[0];
+    cuerpo = `<h1 class="titulo">Tu calificación está publicada</h1>
+      <p class="texto-2">Así la ven los demás. No figuran tu nombre ni tu DNI, solo el tipo de caso.</p>
+      <div class="tarjeta-caso">${cabPerfil}${renderResena(r,false)}</div>
+      <div class="pila"><button class="btn btn-principal btn-bloque" data-action="ver-perfil" data-id="${cal.perfilId}">Ver el perfil</button><button class="btn btn-sec btn-bloque" data-action="tab" data-vista="inicio">Volver al inicio</button></div>`;
+  }
+  return `<div class="pila-g">${barra}<div class="pila-g">${cuerpo}</div></div>`;
 }
 
 /* =========================================================
@@ -491,11 +716,12 @@ const NOTAS = {
   'abogado:casos':['Mazo de casos del abogado','<p>El abogado ve solo casos anonimizados de su jurisdicción y especialidad. Marca "Puedo ayudar" o "Paso".</p><ul><li>Si la persona ya marcó interés, se abre el match.</li><li>Cupo semanal según el plan: el precio nunca depende de cuántos clientes consigue (Ley 23.187, art. 10 inc. f).</li><li>En casos de alimentos se avisa que la cuota litis no está permitida (Ley 27.423, art. 6).</li></ul>'],
   'abogado:verificacion':['Verificación de matrícula','<p>Ningún perfil aparece hasta que el colegio confirma la matrícula activa. Identidad con selfie y DNI, matrícula contra el padrón del colegio, revalidación cada 6 meses.</p><p style="margin-top:8px">Tocá "Simular respuesta del colegio" para continuar.</p>'],
   'abogado:chats':['Chats del abogado','<p>Mismo chat cifrado que ve la persona. El abogado propone horarios para la primera consulta y debe enviar el presupuesto por escrito.</p>'],
-  'abogado:perfil':['Perfil y reglas de publicidad','<p>El perfil tiene plantilla sobria y moderación automática:</p><ul><li>Sin promesas de resultado ni superlativos (Código de Ética CPACF, arts. 10 y 19).</li><li>El honorario de consulta no puede ser menor al mínimo arancelario (Ley 27.423, art. 5).</li><li>Planes con cuota fija, sin pago por caso.</li></ul><p style="margin-top:8px">Probá escribir "te garantizo el mejor resultado" en la presentación.</p>'],
+  'abogado:perfil':['Perfil y reglas de publicidad','<p>El perfil tiene plantilla sobria y moderación automática:</p><ul><li>Sin promesas de resultado ni superlativos (Código de Ética CPACF, arts. 10 y 19).</li><li>El honorario de consulta no puede ser menor al mínimo arancelario (Ley 27.423, art. 5).</li><li>Foto de perfil y calificación de 1 a 5 estrellas. Cada reseña muestra solo el tipo de caso.</li><li>El abogado confirma si la persona fue su cliente, sin ver la calificación antes de publicarse.</li><li>Planes con cuota fija, sin pago por caso.</li></ul><p style="margin-top:8px">Probá escribir "te garantizo el mejor resultado" en la presentación.</p>'],
   'estudio:bandeja':['Bandeja del estudio','<p>El estudio recibe casos como equipo y asigna cada uno a un abogado verificado. Sin asignación no puede responder "Puedo ayudar".</p><ul><li>Quien está en verificación no puede recibir casos.</li><li>El estudio muestra siempre a sus abogados responsables (Ley 27.423, art. 62).</li></ul>'],
   'estudio:equipo':['Equipo','<p>Cada integrante se verifica de forma individual con su colegio. El estudio es una cuenta que agrupa matrículas ya verificadas.</p><p style="margin-top:8px">Invitá a alguien y simulá su verificación.</p>'],
   'estudio:chats':['Chats del estudio','<p>Cada conversación queda a nombre del estudio y del abogado asignado, que es el responsable profesional frente al cliente.</p>'],
-  'estudio:plan':['Plan del estudio','<p>Cuota fija por abogado del equipo. Nunca comisión por caso, pago por contacto ni porcentaje de honorarios.</p>']
+  'estudio:perfil':['Perfil del estudio','<p>Foto o logo, calificación en estrellas y reseñas verificadas, con los abogados responsables siempre visibles.</p><ul><li>El estudio confirma si la persona fue cliente; no ve la calificación antes de publicarse.</li><li>Puede responder reseñas, no borrarlas.</li><li>Cuota fija por abogado: nunca comisión por caso.</li></ul>'],
+  'cliente:calificar':['Calificaciones verificadas','<p>Solo califican personas registradas con nombre completo y DNI que acreditan un caso real con el abogado o el estudio.</p><ul><li>Constancia: convenio de honorarios, recibo o número de expediente.</li><li>El profesional confirma que el caso existió, sin ver la calificación.</li><li>La reseña publica solo el tipo de caso, nunca el nombre ni el DNI.</li><li>Estrellas de 1 a 5.</li></ul><p style="margin-top:8px">Probá calificar al Dr. Tomás Aguirre y después confirmalo desde «Soy abogado».</p>']
 };
 
 /* =========================================================
@@ -521,7 +747,7 @@ function renderPestanas(){
   let tabs = [];
   if (S.rol==='cliente'){
     const c = S.cliente;
-    const enCaso = ['wizard','preview','urgente'].includes(c.vista) ? 'inicio' : (c.vista==='mazo' ? 'caso' : c.vista);
+    const enCaso = ['wizard','preview','urgente','calificar'].includes(c.vista) ? 'inicio' : (c.vista==='mazo' ? 'caso' : c.vista);
     tabs = [['inicio','Inicio'],['caso','Mi caso'],['chats','Chats', c.chats.length>0]];
     nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${enCaso===v||(v==='chats'&&c.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
   } else if (S.rol==='abogado'){
@@ -530,7 +756,7 @@ function renderPestanas(){
     nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${a.vista===v||(v==='chats'&&a.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
   } else {
     const e = S.estudio;
-    tabs = [['bandeja','Bandeja'],['equipo','Equipo'],['chats','Chats', e.chats.length>0],['plan','Plan']];
+    tabs = [['bandeja','Bandeja'],['equipo','Equipo'],['chats','Chats', e.chats.length>0],['perfil','Perfil']];
     nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${e.vista===v||(v==='chats'&&e.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
   }
 }
@@ -557,6 +783,7 @@ function renderCliente(){
   if (c.vista==='caso') return c.caso ? vistaMiCaso() : vistaSinCaso();
   if (c.vista==='chats') return vistaListaChats(c.chats,'cliente');
   if (c.vista==='chat') return vistaChat('cliente');
+  if (c.vista==='calificar') return vistaCalificar();
   return '';
 }
 
@@ -586,6 +813,10 @@ function vistaInicio(){
     <div class="franja">
       ${seal('CPACF')}
       <div><strong>Todos los abogados tienen matrícula verificada</strong><p class="texto-3">Cruzamos sus datos con el colegio de cada jurisdicción. <button class="btn-texto" data-action="como-verificamos">Cómo verificamos</button></p></div>
+    </div>
+    <div class="franja">
+      <div style="flex:1"><strong>¿Ya trabajaste con un abogado o estudio?</strong><p class="texto-3">${c.cal && c.cal.paso===3 ? 'Tu calificación espera la confirmación del profesional.' : 'Calificalo con estrellas. Solo publicamos el tipo de caso.'}</p></div>
+      <button class="btn btn-sec" style="min-height:40px;padding:0 14px" data-action="calificar">${c.cal && c.cal.paso>0 && c.cal.paso<5 ? 'Seguir' : 'Calificar'}</button>
     </div>
     <footer class="pie-legal">
       Justa es un directorio de profesionales. No brinda asesoramiento legal ni es un estudio jurídico.
@@ -720,7 +951,7 @@ function vistaMazo(){
   const siguiente = restantes[1] ? abogado(restantes[1]) : null;
   return `<div>
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-      <h1 class="titulo-chico">Abogados para tu caso</h1>
+      <h1 class="titulo-chico">Profesionales para tu caso</h1>
       <button class="btn-texto" data-action="por-que" style="font-size:14px">Por qué veo estos</button>
     </div>
     <div class="mazo" id="mazo">
@@ -736,23 +967,24 @@ function vistaMazo(){
   </div>`;
 }
 function cartaAbogado(a, detras){
-  const prom = (a.rep.reduce((x,y)=>x+y,0)/a.rep.length).toFixed(1).replace('.',',');
+  const est = a.tipo==='estudio';
   return `<article class="carta${detras?' detras':''}" ${detras?'aria-hidden="true"':'id="carta-actual" tabindex="0" aria-label="'+esc(a.nombre)+'. Deslizá a la derecha si te interesa."'}>
     <span class="etiqueta-swipe si" aria-hidden="true">Me interesa</span>
     <span class="etiqueta-swipe no" aria-hidden="true">Paso</span>
-    <div class="sello-pos">${seal(a.corto)}</div>
-    <div class="avatar" aria-hidden="true">${a.ini}</div>
+    <div class="sello-pos">${seal(a.corto, false, est ? 'EQUIPO VERIFICADO · ESTUDIO · ' : null)}</div>
+    ${fotoDe(a,'')}
     <h2>${esc(a.nombre)}</h2>
-    <p class="matricula">${esc(a.corto)} ${esc(a.mat)} · verificada el ${a.verif}</p>
+    <p class="matricula">${est ? 'Estudio jurídico · '+esc(matDe(a)) : esc(a.corto)+' '+esc(a.mat)+' · verificada el '+a.verif}</p>
+    ${estrellasResumen(a)}
     <div class="chips" style="margin-top:10px">${a.esp.map(([n,comp])=>`<span class="chip ${comp?'chip-ok':''}">${esc(n)}${comp?', comprobada':''}</span>`).join('')}</div>
     <dl class="datos">
-      <div><dt>Años de matrícula</dt><dd>${a.anios}</dd></div>
+      <div><dt>${est?'Años del estudio':'Años de matrícula'}</dt><dd>${a.anios}</dd></div>
       <div><dt>Primera consulta</dt><dd>${a.consulta}</dd></div>
-      <div><dt>Reputación</dt><dd>${prom} de 5 (${a.resenas} reseñas verificadas)</dd></div>
       <div><dt>Responde en</dt><dd>${a.resp} promedio</dd></div>
+      <div><dt>Modalidad</dt><dd>${esc(a.modo)}</dd></div>
     </dl>
     <p class="bio">${esc(a.bio)}</p>
-    <p class="texto-3">${esc(a.modo)} · ${esc(a.juris)}</p>
+    <p class="texto-3">${esc(a.juris)}</p>
   </article>`;
 }
 
@@ -768,11 +1000,11 @@ function vistaMiCaso(){
     </article>
     <section class="pila">
       <h2 class="titulo-chico">Con match</h2>
-      ${c.chats.length ? c.chats.map(ch=>{const a=abogado(ch.abogadoId);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}"><div class="avatar">${a.ini}</div><div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>${esc(ultimo(ch))}</span></div><span class="estado ok">Match</span></button>`}).join('') : '<p class="texto-3">Todavía ninguno.</p>'}
+      ${c.chats.length ? c.chats.map(ch=>{const a=abogado(ch.abogadoId);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}">${fotoDe(a,'m')}<div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>${esc(ultimo(ch))}</span></div><span class="estado ok">Match</span></button>`}).join('') : '<p class="texto-3">Todavía ninguno.</p>'}
     </section>
     <section class="pila">
       <h2 class="titulo-chico">Esperando respuesta</h2>
-      ${c.pendientes.length ? c.pendientes.map(id=>{const a=abogado(id);return `<div class="item"><div class="avatar">${a.ini}</div><div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>Le avisamos de tu interés</span></div><button class="btn btn-sec" style="min-height:36px;padding:0 12px;font-size:14px" data-action="simular-acepta" data-id="${id}">Simular respuesta</button></div>`}).join('') : '<p class="texto-3">Nadie pendiente.</p>'}
+      ${c.pendientes.length ? c.pendientes.map(id=>{const a=abogado(id);return `<div class="item">${fotoDe(a,'m')}<div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>Le avisamos de tu interés</span></div><button class="btn btn-sec" style="min-height:36px;padding:0 12px;font-size:14px" data-action="simular-acepta" data-id="${id}">Simular respuesta</button></div>`}).join('') : '<p class="texto-3">Nadie pendiente.</p>'}
     </section>
     <div class="pila">
       ${c.likes>0 && (c.orden||[]).length>c.indice ? '<button class="btn btn-principal btn-bloque" data-action="ir-mazo">Seguir viendo abogados</button>' : ''}
@@ -788,7 +1020,7 @@ function vistaSinCaso(){
 /* ---------------- Chats (compartido) ---------------- */
 function ultimo(ch){ const m = [...ch.msgs].reverse().find(x=>x.de!=='sistema'); return m ? m.texto : 'Chat abierto'; }
 function contraparteDe(rol, ch){
-  if (rol==='cliente'){ const a = abogado(ch.abogadoId); return {nombre:a.nombre, ini:a.ini, sub:a.corto+' '+a.mat}; }
+  if (rol==='cliente'){ const a = abogado(ch.abogadoId); return {nombre:a.nombre, ini:a.ini, perfil:a, sub:a.tipo==='estudio'?'Estudio jurídico':a.corto+' '+a.mat}; }
   if (rol==='abogado') return {nombre:ch.cliente, ini:'C', sub:ch.compartido?ch.datos:'Identidad sin compartir'};
   return {nombre:ch.cliente, ini:'C', sub:'Asignado a '+ch.asignado};
 }
@@ -798,7 +1030,7 @@ function vistaListaChats(chats, rol){
     const btn = rol==='cliente' ? (S.cliente.caso?'<button class="btn btn-principal btn-bloque" data-action="ir-mazo">Ver abogados</button>':'<button class="btn btn-principal btn-bloque" data-action="empezar">Contar mi caso</button>') : `<button class="btn btn-principal btn-bloque" data-action="tab" data-vista="${rol==='abogado'?'casos':'bandeja'}">Ver casos</button>`;
     return `<div class="vacio"><h2>Sin chats todavía</h2><p>${txt}</p><div style="margin-top:20px">${btn}</div></div>`;
   }
-  return `<div class="pila"><h1 class="titulo" style="margin-bottom:8px">Chats</h1>${chats.map(ch=>{const o=contraparteDe(rol,ch);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}"><div class="avatar">${esc(o.ini)}</div><div class="cuerpo"><strong>${esc(o.nombre)}</strong><span>${esc(ultimo(ch))}</span></div></button>`}).join('')}</div>`;
+  return `<div class="pila"><h1 class="titulo" style="margin-bottom:8px">Chats</h1>${chats.map(ch=>{const o=contraparteDe(rol,ch);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}">${o.perfil?fotoDe(o.perfil,'s'):'<div class="avatar">'+esc(o.ini)+'</div>'}<div class="cuerpo"><strong>${esc(o.nombre)}</strong><span>${esc(ultimo(ch))}</span></div></button>`}).join('')}</div>`;
 }
 function vistaChat(rol){
   const st = S[rol];
@@ -806,12 +1038,12 @@ function vistaChat(rol){
   if (!ch) return vistaListaChats(st.chats, rol);
   const o = contraparteDe(rol, ch);
   const herramientas = rol==='cliente'
-    ? `${ch.compartido?'':'<button data-action="compartir-datos">Compartir mis datos</button>'}<button data-action="horarios">Ver horarios</button><button data-action="reportar">Reportar</button>`
+    ? `${ch.compartido?'':'<button data-action="compartir-datos">Compartir mis datos</button>'}<button data-action="horarios">Ver horarios</button><button data-action="calificar" data-perfil="${ch.abogadoId}">Calificar</button><button data-action="reportar">Reportar</button>`
     : `<button data-action="horarios">Proponer horario</button><button data-action="presupuesto">Enviar presupuesto</button><button data-action="conflicto">Control de conflictos</button>`;
   return `<div class="chat">
     <div class="chat-cab">
       <button class="volver" data-action="tab" data-vista="chats" aria-label="Volver a chats">‹</button>
-      <div class="avatar">${esc(o.ini)}</div>
+      ${o.perfil?fotoDe(o.perfil,'s'):'<div class="avatar">'+esc(o.ini)+'</div>'}
       <div><strong>${esc(o.nombre)}</strong><div class="texto-3">${esc(o.sub)}</div></div>
     </div>
     <div class="banner-hon">${rol==='cliente'?'Pedí el presupuesto por escrito antes de empezar. Se paga directo al profesional.':'Enviá el presupuesto por escrito. El honorario no puede ser menor al arancel.'}</div>
@@ -901,8 +1133,13 @@ function vistaPerfilAbogado(){
   const bajo = hon < minimo;
   const malas = revisarBio(a.bio);
   return `<div class="pila-g">
-    <div class="perfil-cab">${seal('CPACF', !a.verificado)}<div><h1 class="titulo-chico">Dr. Tomás Aguirre</h1><p class="texto-3">CPACF T° 154 F° 233 · ${a.verificado?'verificada el 20/10/2026':'en verificación'}</p></div></div>
+    <div class="perfil-cab">${fotoDe(abogado('a8'),'g')}<div style="flex:1"><h1 class="titulo-chico">Dr. Tomás Aguirre</h1><p class="texto-3">CPACF T° 154 F° 233 · ${a.verificado?'verificada el 20/10/2026':'en verificación'}</p>${estrellasResumen(abogado('a8'))}</div>${seal('CPACF', !a.verificado)}</div>
+    <div class="pila">
+      <div class="subir-foto"><label class="btn btn-sec" for="foto-a8" style="flex:1">Cambiar foto de perfil</label><input type="file" id="foto-a8" class="sr" accept="image/*" data-input="foto" data-perfil="a8"></div>
+      <p class="ayuda">Foto profesional de frente, sin logos ni texto. Un moderador la revisa antes de publicarla.</p>
+    </div>
     <div class="chips"><span class="chip chip-ok">Derecho laboral, comprobada</span><span class="chip">Seguridad social, declarada</span></div>
+    ${bloqueResenasPropias('a8')}
     <div class="campo">
       <label for="hon">Honorario de primera consulta (pesos)</label>
       <input id="hon" inputmode="numeric" data-input="honorario" value="${esc(a.honorario)}">
@@ -933,7 +1170,7 @@ function renderEstudio(){
   if (e.vista==='equipo') return vistaEquipo();
   if (e.vista==='chats') return vistaListaChats(e.chats,'estudio');
   if (e.vista==='chat') return vistaChat('estudio');
-  if (e.vista==='plan') return vistaPlanEstudio();
+  if (e.vista==='perfil') return vistaPerfilEstudio();
   return '';
 }
 function vistaBandeja(){
@@ -967,7 +1204,7 @@ function vistaEquipo(){
   return `<div class="pila-g">
     <div><h1 class="titulo">Equipo</h1><p class="texto-2" style="margin-top:6px">Cada abogado se verifica con su colegio. El estudio muestra siempre quién es responsable de cada caso.</p></div>
     <div class="pila">
-      ${e.equipo.map(m=>`<div class="item"><div class="avatar">${esc(m.ini)}</div><div class="cuerpo"><strong>${esc(m.nombre)}</strong><span>${esc(m.rol)} · ${esc(m.esp)} · ${esc(m.mat)}</span></div>${m.estado==='ok'?'<span class="estado ok">Verificada</span>':`<button class="btn btn-sec" style="min-height:36px;padding:0 10px;font-size:13px" data-action="aprobar-miembro" data-id="${m.id}">Simular verificación</button>`}</div>`).join('')}
+      ${e.equipo.map(m=>`<div class="item">${fotoMiembro(m)}<div class="cuerpo"><strong>${esc(m.nombre)}</strong><span>${esc(m.rol)} · ${esc(m.esp)} · ${esc(m.mat)}</span></div>${m.estado==='ok'?'<span class="estado ok">Verificada</span>':`<button class="btn btn-sec" style="min-height:36px;padding:0 10px;font-size:13px" data-action="aprobar-miembro" data-id="${m.id}">Simular verificación</button>`}</div>`).join('')}
     </div>
     <form class="pila" data-form="invitar">
       <h2 class="titulo-chico">Invitar a un abogado</h2>
@@ -977,13 +1214,23 @@ function vistaEquipo(){
     </form>
   </div>`;
 }
-function vistaPlanEstudio(){
-  const n = S.estudio.equipo.filter(m=>m.estado==='ok').length;
+function vistaPerfilEstudio(){
+  const e = S.estudio, p = abogado('e1');
+  const verif = e.equipo.filter(m=>m.estado==='ok');
   return `<div class="pila-g">
-    <h1 class="titulo">Plan del estudio</h1>
-    <article class="plan" aria-pressed="true"><h3>Estudio, cuota fija por abogado</h3><ul><li>${n} ${n===1?'asiento activo':'asientos activos'} (solo abogados verificados)</li><li>Bandeja compartida, asignación de casos y agenda del equipo</li><li>Precio de beta a definir</li></ul></article>
-    <div class="aviso aviso-lacre">Justa no cobra comisión por caso, pago por contacto ni porcentaje de honorarios. Tampoco vende posiciones destacadas.</div>
-    <div class="pie-legal">Los planes pagos se pueden cancelar con el <button class="boton-legal" data-action="legal" data-doc="baja">Botón de baja</button> y revocar dentro de los 10 días con el <button class="boton-legal" data-action="legal" data-doc="arrep">Botón de arrepentimiento</button>.</div>
+    <div class="perfil-cab">${fotoDe(p,'g')}<div style="flex:1"><h1 class="titulo-chico">${esc(p.nombre)}</h1><p class="texto-3">Estudio jurídico · ${verif.length} abogados verificados</p>${estrellasResumen(p)}</div>${seal('ESTUDIO', false, 'EQUIPO VERIFICADO · ESTUDIO · ')}</div>
+    <div class="pila">
+      <div class="subir-foto"><label class="btn btn-sec" for="foto-e1" style="flex:1">Subir foto del equipo o logo</label><input type="file" id="foto-e1" class="sr" accept="image/*" data-input="foto" data-perfil="e1"></div>
+      <p class="ayuda">Un moderador la revisa antes de publicarla.</p>
+    </div>
+    <div class="aviso aviso-info"><strong>Abogados responsables visibles en el perfil</strong><ul class="lista-no">${verif.map(m=>`<li>${esc(m.nombre)}, ${esc(m.mat)}</li>`).join('')}</ul></div>
+    ${bloqueResenasPropias('e1')}
+    <section class="pila">
+      <h2 class="titulo-chico">Plan</h2>
+      <article class="plan" aria-pressed="true"><h3>Estudio, cuota fija por abogado</h3><ul><li>${verif.length} ${verif.length===1?'asiento activo':'asientos activos'} (solo abogados verificados)</li><li>Bandeja compartida, asignación de casos y agenda del equipo</li><li>Precio de beta a definir</li></ul></article>
+      <div class="aviso aviso-lacre">Justa no cobra comisión por caso, pago por contacto ni porcentaje de honorarios. Tampoco vende posiciones destacadas.</div>
+      <div class="pie-legal">Los planes pagos se pueden cancelar con el <button class="boton-legal" data-action="legal" data-doc="baja">Botón de baja</button> y revocar dentro de los 10 días con el <button class="boton-legal" data-action="legal" data-doc="arrep">Botón de arrepentimiento</button>.</div>
+    </section>
   </div>`;
 }
 
@@ -998,32 +1245,34 @@ function cerrarHoja(){ $('#capa').innerHTML=''; }
 function cabHoja(t){ return `<div class="hoja-cab"><h2 class="titulo-chico">${t}</h2><button class="cerrar" data-action="cerrar" aria-label="Cerrar">×</button></div>`; }
 
 function hojaPerfil(id){
-  const a = abogado(id);
-  const dims = ['Claridad para explicar','Trato','Tiempos de respuesta','Cumplimiento de lo acordado'];
+  const a = abogado(id), est = a.tipo==='estudio', v = promedio(a);
   abrirHoja(`${cabHoja(esc(a.nombre))}
     <div class="pila-g" style="margin-top:12px">
-      <div class="perfil-cab">${seal(a.corto)}<div><strong>Matrícula verificada</strong><p class="texto-3">${esc(a.colegio)}<br>${esc(a.mat)} · verificada el ${a.verif}</p></div></div>
+      <div class="perfil-cab">${fotoDe(a,'g')}<div>${estrellasResumen(a)}<p class="texto-3" style="margin-top:4px">${est?'Estudio jurídico':esc(a.juris)}</p></div></div>
+      <div class="perfil-cab">${seal(a.corto, false, est ? 'EQUIPO VERIFICADO · ESTUDIO · ' : null)}<div><strong>${est?'Equipo verificado':'Matrícula verificada'}</strong><p class="texto-3">${esc(a.colegio)}<br>${esc(matDe(a))} · verificada el ${a.verif}</p></div></div>
+      ${responsablesDe(a)?`<div><h3 style="font-size:17px">Abogados responsables</h3><ul class="lista-no">${responsablesDe(a).map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`:''}
       <div><h3 style="font-size:17px;margin-bottom:6px">Especialidades</h3><div class="chips">${a.esp.map(([n,c])=>`<span class="chip ${c?'chip-ok':''}">${esc(n)}: ${c?'comprobada':'declarada'}</span>`).join('')}</div></div>
       <p>${esc(a.bio)}</p>
-      <dl class="datos"><div><dt>Modalidad</dt><dd>${esc(a.modo)}</dd></div><div><dt>Primera consulta</dt><dd>${a.consulta}, pago directo</dd></div><div><dt>Jurisdicción</dt><dd>${esc(a.juris)}</dd></div><div><dt>Años de matrícula</dt><dd>${a.anios}</dd></div></dl>
-      <div class="pila"><h3 style="font-size:17px">Reputación (${a.resenas} reseñas verificadas)</h3>
-        ${dims.map((d,i)=>`<div class="barra-rep"><span>${d}</span><span class="pista"><span style="width:${a.rep[i]/5*100}%"></span></span><strong>${a.rep[i].toFixed(1).replace('.',',')}</strong></div>`).join('')}
+      <dl class="datos"><div><dt>Modalidad</dt><dd>${esc(a.modo)}</dd></div><div><dt>Primera consulta</dt><dd>${a.consulta}, pago directo</dd></div><div><dt>Jurisdicción</dt><dd>${esc(a.juris)}</dd></div><div><dt>${est?'Años del estudio':'Años de matrícula'}</dt><dd>${a.anios}</dd></div></dl>
+      <div class="pila">
+        <h3 style="font-size:17px">Calificaciones</h3>
+        <div class="estrellas">${estrellasHTML(v,'g')}<span><strong>${fmt(v)}</strong> de 5 · ${cantidad(a)} reseñas verificadas</span></div>
+        <p class="texto-3">Solo califican personas registradas con nombre completo y DNI que acreditaron un caso con ${est?'este estudio':'este profesional'}. De cada reseña publicamos solo el tipo de caso.</p>
+        ${resenasDe(a).map(r=>renderResena(r,false)).join('')}
       </div>
-      <div class="pila">${RESENAS.map(([t,r])=>`<div class="resena">${esc(t)}${r?`<div class="replica">Réplica: ${esc(r)}</div>`:''}</div>`).join('')}</div>
       <div class="aviso aviso-info"><strong>Lo que no vas a ver en ningún perfil</strong><ul class="lista-no"><li>Porcentaje de juicios ganados</li><li>Montos obtenidos en otros casos</li><li>Nombres de clientes o detalles de sus casos</li></ul></div>
     </div>`);
 }
 function hojaMatch(id, rol){
-  const a = rol==='cliente' ? abogado(id) : null;
-  const nombre = a ? a.nombre : id;
-  const iniA = a ? a.ini : 'C';
-  const iniB = rol==='cliente' ? 'Vos' : (rol==='estudio'?'TG':'TA');
+  let fotoA, fotoB, nombre = id;
+  if (rol==='cliente'){ const a = abogado(id); nombre = a.nombre; fotoA = fotoDe(a,'g'); fotoB = '<div class="avatar">Vos</div>'; }
+  else { fotoA = '<div class="avatar">C</div>'; fotoB = fotoDe(abogado(rol==='estudio'?'e1':'a8'),'g'); }
   abrirHoja(`<div class="match pila-g">
-    <div class="pareja"><div class="avatar">${esc(iniA)}</div><div class="avatar" style="font-size:${iniB.length>2?'18px':'24px'}">${esc(iniB)}</div></div>
+    <div class="pareja">${fotoA}${fotoB}</div>
     <h2>Hay match</h2>
     <p class="texto-2">${rol==='cliente' ? esc(nombre)+' puede ayudarte con tu caso.' : 'Esta persona también te eligió. Ya pueden hablar.'}</p>
     <div class="aviso aviso-lacre" style="text-align:left">${rol==='cliente'?'Justa no es tu abogado. El acuerdo de honorarios lo firmás directamente con el profesional.':'El contrato y los honorarios se pactan por escrito y en forma directa con el cliente. Verificá conflictos de intereses antes de aceptar.'}</div>
-    <div class="pila"><button class="btn btn-principal btn-bloque" data-action="ir-chat-match">Abrir chat</button><button class="btn btn-sec btn-bloque" data-action="cerrar">${rol==='cliente'?'Seguir viendo abogados':'Seguir viendo casos'}</button></div>
+    <div class="pila"><button class="btn btn-principal btn-bloque" data-action="ir-chat-match">Abrir chat</button><button class="btn btn-sec btn-bloque" data-action="cerrar">${rol==='cliente'?'Seguir viendo':'Seguir viendo casos'}</button></div>
   </div>`, true);
 }
 const LEGALES = {
@@ -1110,6 +1359,55 @@ const acciones = {
       e.chats.unshift(ch); e.chatAbierto=ch.id; render(); hojaMatch(k.cliente,'estudio');
     } else { render(); toast('Le avisamos a la persona que '+m.nombre+' puede ayudar.'); }
   },
+  calificar: d => {
+    const c = S.cliente;
+    if (!c.cal || c.cal.paso===5 || (d.perfil && c.cal.paso>=3)) c.cal = {paso: c.registro?1:0, perfilId:null, tipo:'', anio:'', constTipo:'', archivo:'', expediente:'', pendId:null, estrellas:0, texto:''};
+    if (d.perfil && c.cal.paso<=1){ c.cal.perfilId = d.perfil; if (c.caso) c.cal.tipo = temaLabel(c.caso.tema); if (c.registro) c.cal.paso = 2; }
+    c.vista = 'calificar'; cerrarHoja(); render(); $('#pantalla').scrollTop = 0;
+  },
+  'cal-registrar': () => {
+    const c = S.cliente, nombre = $('#reg-nombre').value.trim(), dni = $('#reg-dni').value.trim();
+    if (nombre.split(/\s+/).filter(w=>w.length>=2).length < 2){ toast('Escribí tu nombre y apellido completos.'); return; }
+    if (!/^\d{1,2}\.?\d{3}\.?\d{3}$/.test(dni)){ toast('El DNI tiene que tener 7 u 8 números.'); return; }
+    if (!$('#reg-decl').checked){ toast('Marcá la declaración para continuar.'); return; }
+    c.registro = {nombre, dni: dni.replace(/\D/g,'')};
+    c.cal.paso = c.cal.perfilId ? 2 : 1; render(); $('#pantalla').scrollTop = 0;
+    toast('Identidad validada. Tu DNI no se publica.');
+  },
+  'cal-perfil': d => { const cal = S.cliente.cal; cal.perfilId = d.id; cal.paso = 2; render(); $('#pantalla').scrollTop = 0; },
+  'cal-const': d => { S.cliente.cal.constTipo = d.valor; render(); },
+  'cal-atras': () => { const c = S.cliente, cal = c.cal; if (cal.paso===2) cal.paso = 1; else { c.vista = 'inicio'; } render(); },
+  'cal-enviar': () => {
+    const c = S.cliente, cal = c.cal;
+    if (!cal.tipo){ toast('Elegí el tipo de caso.'); return; }
+    if (!cal.anio){ toast('Elegí el año.'); return; }
+    if (!cal.constTipo){ toast('Elegí qué constancia tenés.'); return; }
+    if (cal.constTipo==='Número de expediente' ? !(cal.expediente||'').trim() : !cal.archivo){ toast('Falta la constancia.'); return; }
+    if (S.pendRes.some(x=>x.perfilId===cal.perfilId && x.nombre===c.registro.nombre && x.tipo===cal.tipo && x.anio===cal.anio && x.estado!=='revision')){ toast('Ya enviaste una calificación para ese caso.'); return; }
+    const pend = {id:'p'+Date.now(), perfilId:cal.perfilId, tipo:cal.tipo, anio:cal.anio, constTipo:cal.constTipo, nombre:c.registro.nombre, estado:'pendiente'};
+    S.pendRes.push(pend); cal.pendId = pend.id; cal.paso = 3; render(); $('#pantalla').scrollTop = 0;
+  },
+  'cal-simular': () => { const cal = S.cliente.cal; S.pendRes.find(x=>x.id===cal.pendId).estado = 'confirmada'; render(); },
+  'cal-a-estrellas': () => { S.cliente.cal.paso = 4; render(); $('#pantalla').scrollTop = 0; },
+  'cal-estrella': d => { S.cliente.cal.estrellas = +d.n; render(); },
+  'cal-publicar': () => {
+    const cal = S.cliente.cal;
+    if (!cal.estrellas){ toast('Elegí de 1 a 5 estrellas.'); return; }
+    const pend = S.pendRes.find(x=>x.id===cal.pendId);
+    const texto = cal.texto ? anonimizar(cal.texto.trim()).texto : '';
+    (S.resenas[cal.perfilId] = S.resenas[cal.perfilId] || []).unshift({id:'r'+Date.now(), e:cal.estrellas, tipo:pend.tipo, fecha:'octubre 2026', texto});
+    pend.estado = 'publicada'; cal.paso = 5; render(); $('#pantalla').scrollTop = 0;
+  },
+  'confirmar-caso': d => {
+    const x = S.pendRes.find(y=>y.id===d.id);
+    if (x.semilla){
+      (S.resenas[x.perfilId] = S.resenas[x.perfilId] || []).unshift({id:'r'+Date.now(), e:x.semilla, tipo:x.tipo, fecha:'octubre 2026', texto: x.semilla===5 ? 'Muy claro con los plazos y los costos desde el principio.' : 'Buena atención. Al principio tardaron un poco en responder.'});
+      x.estado = 'publicada'; render(); toast('Confirmaste el caso. La persona ya publicó su calificación.');
+    } else { x.estado = 'confirmada'; render(); toast('Confirmaste el caso. La persona ya puede calificarte.'); }
+  },
+  'rechazar-caso': d => { S.pendRes.find(y=>y.id===d.id).estado = 'revision'; render(); toast('Una persona del equipo revisa la constancia.'); },
+  'responder-resena': d => abrirHoja(`${cabHoja('Responder la reseña')}<div class="pila-g" style="margin-top:12px"><div class="campo"><label for="replica-txt">Tu respuesta</label><textarea id="replica-txt" maxlength="300" placeholder="Agradecé o aclará con respeto. No reveles nada del caso."></textarea></div><p class="ayuda">El secreto profesional sigue vigente: no menciones datos ni detalles del caso.</p><button class="btn btn-principal btn-bloque" data-action="guardar-replica" data-id="${d.id}">Publicar respuesta</button></div>`),
+  'guardar-replica': d => { const t = ($('#replica-txt').value||'').trim(); if (!t){ toast('Escribí una respuesta.'); return; } S.replicas[d.id] = anonimizar(t).texto; cerrarHoja(); render(); toast('Respuesta publicada'); },
   'aprobar-miembro': d => { const m=S.estudio.equipo.find(x=>x.id===d.id); m.estado='ok'; render(); toast(m.nombre+' quedó verificada con su colegio.'); }
 };
 
@@ -1182,6 +1480,7 @@ document.addEventListener('input', ev => {
     if (k==='frase'){ b.frase=t.value; const cont=$('#cont'); if(cont) cont.textContent=t.value.length; const s=$('#btn-sig'); if(s) s.disabled=t.value.trim().length<10; }
     if (k==='localidad') b.localidad=t.value;
     if (k==='tel') S.cliente.tel=t.value;
+    if (S.cliente.cal){ if (k==='cal-exp') S.cliente.cal.expediente=t.value; if (k==='cal-texto') S.cliente.cal.texto=t.value; if (k==='reg-nombre') S.cliente.cal.regNombre=t.value; if (k==='reg-dni') S.cliente.cal.regDni=t.value; }
   }
   if (S.rol==='abogado'){
     const a=S.abogado;
@@ -1193,6 +1492,14 @@ document.addEventListener('change', ev => {
   const t = ev.target, k = t.dataset.input; if (!k) return;
   if (k==='provincia'){ S.cliente.borrador.provincia=t.value; const s=$('#btn-sig'); if(s) s.disabled=!t.value; }
   if (k==='asignar'){ S.estudio.asignaciones[t.dataset.caso]=t.value; render(); }
+  if (k==='cal-tipo') S.cliente.cal.tipo=t.value;
+  if (k==='cal-anio') S.cliente.cal.anio=t.value;
+  if (k==='constancia' && t.files[0]){ S.cliente.cal.archivo=t.files[0].name; render(); }
+  if (k==='foto' && t.files[0]){
+    if (!t.files[0].type.startsWith('image/')){ toast('Elegí una imagen.'); return; }
+    if (S.fotos[t.dataset.perfil]) URL.revokeObjectURL(S.fotos[t.dataset.perfil]);
+    S.fotos[t.dataset.perfil] = URL.createObjectURL(t.files[0]); render(); toast('Foto actualizada. En producción la revisa un moderador.');
+  }
 });
 document.addEventListener('submit', ev => {
   const f = ev.target.closest('[data-form]'); if (!f) return;
