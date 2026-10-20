@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Justa · beta</title>
+<meta name="description" content="Beta de Justa: conecta personas con abogados de matrícula verificada en Argentina.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:#E9ECF2;
+  --papel:#FFFFFF;
+  --papel-2:#F6F7FA;
+  --tinta:#18233A;
+  --tinta-2:#4B5568;
+  --tinta-3:#6B7385;
+  --linea:#D7DBE5;
+  --lacre:#8E2A3B;
+  --lacre-osc:#6E1F2D;
+  --lacre-claro:#F5E8EB;
+  --ok:#2C7A57;
+  --ok-claro:#E4F1EA;
+  --alerta:#8A5300;
+  --alerta-claro:#FFF1D6;
+  --foco:#3552C9;
+  --serif:'Literata', Georgia, serif;
+  --sans:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r-chico:8px;
+  --r-medio:14px;
+  --r-grande:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--sans);font-size:16px;line-height:1.5;color:var(--tinta);
+  background:var(--fondo);
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--foco);outline-offset:2px;border-radius:6px}
+a{color:var(--lacre)}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.2;margin:0}
+p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Estructura general ---------- */
+.escena{min-height:100%;display:flex;justify-content:center;gap:48px;padding:0}
+.panel{display:none}
+.telefono{
+  width:100%;max-width:100%;height:100dvh;background:var(--papel-2);
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+}
+@media (min-width:980px){
+  .escena{padding:40px 32px;align-items:flex-start}
+  .panel{display:block;width:340px;position:sticky;top:40px;padding-top:12px}
+  .telefono{
+    width:400px;height:min(840px,calc(100dvh - 80px));border-radius:36px;
+    border:10px solid var(--tinta);box-shadow:0 30px 60px -30px rgba(24,35,58,.45);
+  }
+}
+
+/* ---------- Panel lateral (solo escritorio) ---------- */
+.panel .marca{font-family:var(--serif);font-size:44px;font-weight:700;letter-spacing:-.02em;color:var(--tinta)}
+.panel .bajada{font-size:17px;color:var(--tinta-2);margin-top:8px;max-width:30ch}
+.panel .bloque{margin-top:28px;padding-top:20px;border-top:1px solid var(--linea)}
+.panel h2{font-size:18px;margin-bottom:8px}
+.panel .nota{font-size:15px;color:var(--tinta-2)}
+.panel .nota strong{color:var(--tinta)}
+.panel .nota ul{padding-left:18px;margin:8px 0 0}
+.panel .nota li{margin:4px 0}
+.panel .aviso-beta{font-size:13px;color:var(--tinta-3);margin-top:28px}
+.btn-texto{background:none;border:0;padding:0;color:var(--lacre);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Barra superior y selector de rol ---------- */
+.barra{background:var(--papel);border-bottom:1px solid var(--linea);padding:12px 16px 10px;flex:none}
+.barra-fila{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+.etiqueta-beta{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--lacre);background:var(--lacre-claro);padding:2px 8px;border-radius:999px}
+.btn-reiniciar{background:none;border:0;font-size:13px;color:var(--tinta-3);text-decoration:underline;text-underline-offset:3px;padding:4px}
+.roles{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:3px}
+.roles button{border:0;background:none;border-radius:999px;padding:7px 4px;font-size:13.5px;font-weight:600;color:var(--tinta-2);white-space:nowrap}
+.roles button[aria-pressed="true"]{background:var(--tinta);color:#fff}
+
+/* ---------- Pantalla y navegación ---------- */
+.pantalla{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px 28px;position:relative}
+.pestanas{flex:none;display:flex;background:var(--papel);border-top:1px solid var(--linea);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+.pestanas button{flex:1;border:0;background:none;padding:8px 4px;font-size:13px;font-weight:600;color:var(--tinta-3);border-radius:10px;position:relative}
+.pestanas button[aria-current="page"]{color:var(--tinta);background:var(--papel-2)}
+.pestanas .punto{position:absolute;top:6px;margin-left:4px;width:8px;height:8px;border-radius:50%;background:var(--lacre);display:inline-block}
+
+/* ---------- Tipografía de pantalla ---------- */
+.titulo{font-size:28px;letter-spacing:-.015em}
+.titulo-chico{font-size:21px}
+.texto-2{color:var(--tinta-2)}
+.texto-3{color:var(--tinta-3);font-size:14px}
+.pila>*+*{margin-top:12px}
+.pila-g>*+*{margin-top:20px}
+
+/* ---------- Botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;border:1px solid transparent;font-weight:600;font-size:16px;text-decoration:none}
+.btn-principal{background:var(--lacre);color:#fff}
+.btn-principal:hover{background:var(--lacre-osc)}
+.btn-principal:disabled{background:#C9B3B8;cursor:not-allowed}
+.btn-sec{background:var(--papel);border-color:var(--linea);color:var(--tinta)}
+.btn-sec:hover{border-color:var(--tinta-3)}
+.btn-alerta{background:var(--alerta-claro);color:var(--alerta);border-color:#EBCB8B}
+.btn-bloque{width:100%}
+.fila-btns{display:flex;gap:10px}
+.fila-btns .btn{flex:1}
+
+/* ---------- Home cliente ---------- */
+.hero{padding:8px 0 4px}
+.hero h1{font-size:34px;letter-spacing:-.02em;line-height:1.1}
+.hero p{margin-top:12px;font-size:17px;color:var(--tinta-2)}
+.temas-rapidos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tema-rapido{text-align:left;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-medio);padding:14px;font-weight:600;font-size:15px;line-height:1.3;min-height:64px}
+.tema-rapido:hover{border-color:var(--tinta-3)}
+.franja{display:flex;gap:12px;align-items:center;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-medio);padding:14px}
+.franja .seal{width:52px;height:52px;flex:none}
+.pie-legal{font-size:13px;color:var(--tinta-3);border-top:1px solid var(--linea);padding-top:14px}
+.pie-legal .enlaces{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.pie-legal button{background:none;border:0;padding:0;font-size:13px;color:var(--tinta-2);text-decoration:underline;text-underline-offset:3px}
+.pie-legal .boton-legal{font-weight:700;color:var(--tinta)}
+
+/* ---------- Wizard ---------- */
+.progreso{display:flex;gap:6px;margin-bottom:6px}
+.progreso span{flex:1;height:5px;border-radius:999px;background:var(--linea)}
+.progreso span.hecho{background:var(--lacre)}
+.paso-de{font-size:13px;color:var(--tinta-3)}
+.opciones{display:grid;gap:10px}
+.opciones.dos{grid-template-columns:1fr 1fr}
+.opcion{text-align:left;background:var(--papel);border:1.5px solid var(--linea);border-radius:var(--r-medio);padding:14px 16px;font-size:16px}
+.opcion small{display:block;color:var(--tinta-3);font-size:13.5px;margin-top:2px}
+.opcion strong{font-weight:600}
+.opcion[aria-pressed="true"]{border-color:var(--lacre);background:var(--lacre-claro)}
+.pregunta{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:10px}
+.campo label{display:block;font-weight:600;margin-bottom:6px}
+.campo input,.campo select,.campo textarea{width:100%;background:var(--papel);border:1.5px solid var(--linea);border-radius:12px;padding:12px 14px;font-size:16px}
+.campo textarea{min-height:120px;resize:vertical;line-height:1.45}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--foco);outline:none}
+.ayuda{font-size:14px;color:var(--tinta-3);margin-top:6px}
+.contador{text-align:right;font-size:13px;color:var(--tinta-3);margin-top:4px}
+.aviso{border-radius:var(--r-medio);padding:12px 14px;font-size:14.5px;border:1px solid}
+.aviso-info{background:var(--papel);border-color:var(--linea);color:var(--tinta-2)}
+.aviso-alerta{background:var(--alerta-claro);border-color:#EBCB8B;color:#5E3A00}
+.aviso-ok{background:var(--ok-claro);border-color:#B9DCC8;color:#1F5A40}
+.aviso-lacre{background:var(--lacre-claro);border-color:#E3C4CB;color:var(--lacre-osc)}
+.acciones-fijas{position:sticky;bottom:-28px;background:linear-gradient(to top,var(--papel-2) 70%,transparent);padding:16px 0 4px;margin-top:20px}
+
+/* ---------- Vista previa anonimizada ---------- */
+.tarjeta-caso{background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-grande);padding:18px}
+.tarjeta-caso .frase{font-family:var(--serif);font-size:18px;line-height:1.45;margin:10px 0 12px}
+.marca-dato{background:var(--lacre-claro);color:var(--lacre-osc);border-radius:4px;padding:0 4px;font-family:var(--sans);font-size:.85em;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:3px 10px;color:var(--tinta-2)}
+.chip-lacre{background:var(--lacre-claro);border-color:#E3C4CB;color:var(--lacre-osc)}
+.chip-ok{background:var(--ok-claro);border-color:#B9DCC8;color:#1F5A40}
+.chip-alerta{background:var(--alerta-claro);border-color:#EBCB8B;color:#5E3A00}
+.check{display:flex;gap:12px;align-items:flex-start;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-medio);padding:14px;font-size:15px}
+.check input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--lacre)}
+.original{font-size:14px;color:var(--tinta-3)}
+.original s{text-decoration-color:var(--lacre);text-decoration-thickness:2px}
+
+/* ---------- Mazo de tarjetas ---------- */
+.mazo{position:relative;height:452px;margin-top:6px}
+.carta{
+  position:absolute;inset:0;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-grande);
+  padding:20px;display:flex;flex-direction:column;touch-action:pan-y;user-select:none;
+  transition:transform .22s ease,opacity .22s ease;box-shadow:0 18px 30px -24px rgba(24,35,58,.5)
+}
+.carta{overflow:hidden}
+.carta.detras{transform:scale(.95) translateY(12px);opacity:.6;pointer-events:none}
+.carta.detras>*{visibility:hidden}
+.carta .sello-pos{position:absolute;top:16px;right:16px}
+.carta .seal{width:70px;height:70px}
+.avatar{width:64px;height:64px;border-radius:18px;background:var(--tinta);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:24px;font-weight:600}
+.carta h2{font-size:23px;margin-top:14px;letter-spacing:-.01em}
+.matricula{font-size:14px;color:var(--tinta-2);margin-top:2px}
+.datos{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;font-size:14px}
+.datos dt{color:var(--tinta-3);font-size:12.5px}
+.datos dd{margin:0;font-weight:600}
+.carta .bio{margin-top:14px;font-size:15px;color:var(--tinta-2);flex:1}
+.etiqueta-swipe{position:absolute;top:22px;font-weight:700;font-size:18px;padding:4px 12px;border-radius:10px;border:3px solid;opacity:0;transform:rotate(-8deg)}
+.etiqueta-swipe.si{left:18px;color:var(--ok);border-color:var(--ok)}
+.etiqueta-swipe.no{right:100px;color:var(--tinta-3);border-color:var(--tinta-3);transform:rotate(8deg)}
+.controles-mazo{display:grid;grid-template-columns:1fr auto 1.25fr;gap:10px;margin-top:22px;align-items:center}
+.controles-mazo .btn{white-space:nowrap;padding:0 14px}
+.btn-redondo{min-height:52px;border-radius:999px}
+.contador-likes{font-size:14px;color:var(--tinta-2);text-align:center;margin-top:10px}
+.vacio{text-align:center;padding:36px 12px}
+.vacio h2{font-size:22px}
+.vacio p{margin-top:8px;color:var(--tinta-2)}
+
+/* ---------- Sello de matrícula ---------- */
+.seal .anillo{fill:var(--lacre)}
+.seal .nucleo{fill:var(--lacre-osc)}
+.seal .texto-sello{fill:#fff;font-family:var(--sans);font-size:9.6px;font-weight:700;letter-spacing:1.1px}
+.seal .tilde{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.seal.pendiente .anillo{fill:#B9BECB}
+.seal.pendiente .nucleo{fill:#8C93A3}
+
+/* ---------- Hoja inferior / modal ---------- */
+.capa{position:absolute;inset:0;background:rgba(24,35,58,.45);display:flex;align-items:flex-end;z-index:20}
+.hoja{background:var(--papel);width:100%;max-height:88%;overflow-y:auto;border-radius:24px 24px 0 0;padding:22px 18px 24px;animation:subir .22s ease}
+.hoja-centro{align-items:center;padding:20px}
+.hoja-centro .hoja{border-radius:24px;max-height:90%}
+@keyframes subir{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.hoja-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.cerrar{background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;width:36px;height:36px;flex:none;font-size:18px;line-height:1}
+.barra-rep{display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;font-size:14px}
+.barra-rep .pista{height:8px;background:var(--papel-2);border-radius:999px;overflow:hidden;border:1px solid var(--linea)}
+.barra-rep .pista span{display:block;height:100%;background:var(--tinta)}
+.resena{border-top:1px solid var(--linea);padding-top:12px;font-size:15px}
+.resena .replica{margin-top:8px;padding-left:12px;border-left:3px solid var(--linea);color:var(--tinta-2);font-size:14px}
+.lista-no{padding-left:18px;margin:6px 0 0;color:var(--tinta-2);font-size:14.5px}
+
+/* ---------- Match ---------- */
+.match{text-align:center}
+.match .pareja{display:flex;justify-content:center;align-items:center;gap:0;margin:8px 0 16px}
+.match .pareja .avatar{width:76px;height:76px;border:4px solid var(--papel)}
+.match .pareja .avatar+.avatar{margin-left:-14px;background:var(--lacre)}
+.match h2{font-size:28px}
+
+/* ---------- Chat ---------- */
+.chat{display:flex;flex-direction:column;position:absolute;inset:0}
+.chat-cab{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--papel);border-bottom:1px solid var(--linea)}
+.chat-cab .avatar{width:40px;height:40px;border-radius:12px;font-size:16px}
+.chat-cab .volver{background:none;border:0;font-size:22px;padding:4px 8px 4px 0;color:var(--tinta)}
+.banner-hon{background:var(--alerta-claro);color:#5E3A00;font-size:13.5px;padding:8px 16px;border-bottom:1px solid #EBCB8B}
+.mensajes{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.4}
+.msg.yo{align-self:flex-end;background:var(--tinta);color:#fff;border-bottom-right-radius:5px}
+.msg.otro{align-self:flex-start;background:var(--papel);border:1px solid var(--linea);border-bottom-left-radius:5px}
+.msg.sistema{align-self:center;max-width:92%;text-align:center;background:none;color:var(--tinta-3);font-size:13px;padding:4px 8px}
+.herramientas-chat{display:flex;gap:8px;padding:8px 12px 0;background:var(--papel);overflow-x:auto}
+.herramientas-chat button{flex:none;font-size:13.5px;font-weight:600;background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:6px 12px}
+.composer{display:flex;gap:8px;padding:10px 12px;background:var(--papel)}
+.composer input{flex:1;border:1.5px solid var(--linea);border-radius:999px;padding:10px 16px;font-size:15px;background:var(--papel-2)}
+.composer button{border-radius:999px;min-height:44px;padding:0 16px}
+.escribiendo{align-self:flex-start;font-size:13px;color:var(--tinta-3);padding-left:4px}
+
+/* ---------- Listas ---------- */
+.item{display:flex;gap:12px;align-items:center;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-medio);padding:12px 14px;width:100%;text-align:left}
+.item .avatar{width:44px;height:44px;border-radius:13px;font-size:17px;flex:none}
+.item .cuerpo{flex:1;min-width:0}
+.item .cuerpo strong{display:block}
+.item .cuerpo span{display:block;font-size:14px;color:var(--tinta-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.item{text-decoration:none;color:inherit}
+a.item strong{color:var(--lacre);font-size:20px}
+.item.multi .cuerpo span{white-space:normal}
+.perfil-cab .seal{width:64px;height:64px;flex:none}
+.estado{font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.estado.ok{background:var(--ok-claro);color:#1F5A40}
+.estado.pend{background:var(--alerta-claro);color:#5E3A00}
+.estado.gris{background:var(--papel-2);color:var(--tinta-3);border:1px solid var(--linea)}
+
+/* ---------- Abogado: verificación ---------- */
+.pasos-verif{list-style:none;margin:0;padding:0;border:1px solid var(--linea);border-radius:var(--r-medio);background:var(--papel)}
+.pasos-verif li{display:flex;gap:12px;padding:14px;align-items:flex-start}
+.pasos-verif li+li{border-top:1px solid var(--linea)}
+.marca-paso{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:14px;border:2px solid var(--linea);color:var(--tinta-3)}
+.marca-paso.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.marca-paso.pend{border-color:#D9A63F;color:#8A5300;background:var(--alerta-claro)}
+.perfil-cab{display:flex;gap:14px;align-items:center}
+.planes{display:grid;gap:10px}
+.plan{background:var(--papel);border:1.5px solid var(--linea);border-radius:var(--r-medio);padding:14px 16px;text-align:left;width:100%}
+.plan[aria-pressed="true"]{border-color:var(--lacre);background:var(--lacre-claro)}
+.plan h3{font-size:18px}
+.plan ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:var(--tinta-2)}
+.cupo{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--tinta-2)}
+.cupo .barra-cupo{flex:1;height:8px;background:var(--papel);border:1px solid var(--linea);border-radius:999px;margin:0 10px;overflow:hidden}
+.cupo .barra-cupo span{display:block;height:100%;background:var(--lacre)}
+.interruptor{display:flex;gap:12px;align-items:flex-start;background:var(--papel);border:1px solid var(--linea);border-radius:var(--r-medio);padding:14px}
+.interruptor input{width:22px;height:22px;accent-color:var(--lacre);flex:none}
+.caso-equipo .fila{display:flex;gap:8px;margin-top:12px;align-items:stretch}
+.caso-equipo select{flex:1;border:1.5px solid var(--linea);border-radius:12px;padding:0 10px;background:var(--papel);min-height:48px;font-size:15px}
+
+/* ---------- Toast ---------- */
+.toast{position:absolute;left:16px;right:16px;top:150px;box-shadow:0 12px 24px -12px rgba(24,35,58,.5);background:var(--tinta);color:#fff;border-radius:14px;padding:12px 16px;font-size:14.5px;z-index:30;animation:subir .2s ease}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="escena">
+  <aside class="panel" aria-label="Información de la beta">
+    <div class="marca">Justa</div>
+    <p class="bajada">Abogados con matrícula verificada para problemas legales de todos los días.</p>
+    <div class="bloque">
+      <h2 id="nota-titulo">Qué estás viendo</h2>
+      <div class="nota" id="nota-cuerpo"></div>
+    </div>
+    <div class="bloque">
+      <h2>Probá los tres lados</h2>
+      <p class="nota">Cambiá de rol desde la barra superior del teléfono. Cada rol conserva su progreso, así podés ver el mismo caso desde la persona y desde el abogado.</p>
+      <p class="nota" style="margin-top:10px"><button class="btn-texto" data-action="reiniciar">Reiniciar la demo</button></p>
+    </div>
+    <p class="aviso-beta">Beta de demostración. Todos los nombres, matrículas, casos y precios son ficticios. Justa es un directorio de profesionales: no brinda asesoramiento legal.</p>
+  </aside>
+
+  <div class="telefono" id="telefono">
+    <header class="barra">
+      <div class="barra-fila">
+        <div class="logo">Justa <span class="etiqueta-beta">beta</span></div>
+        <button class="btn-reiniciar" data-action="reiniciar">Reiniciar</button>
+      </div>
+      <div class="roles" role="group" aria-label="Elegí cómo usar la app">
+        <button data-action="rol" data-rol="cliente">Necesito ayuda</button>
+        <button data-action="rol" data-rol="abogado">Soy abogado</button>
+        <button data-action="rol" data-rol="estudio">Soy estudio</button>
+      </div>
+    </header>
+    <main class="pantalla" id="pantalla" tabindex="-1"></main>
+    <nav class="pestanas" id="pestanas" aria-label="Secciones"></nav>
+    <div id="capa"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Datos de ejemplo (todo ficticio)
+   ========================================================= */
+const TEMAS = [
+  {id:'trabajo', label:'Trabajo', hint:'Me despidieron, no me pagan, no estoy en blanco'},
+  {id:'familia', label:'Familia', hint:'Separación, cuota alimentaria, visitas'},
+  {id:'alquiler', label:'Alquiler y vivienda', hint:'Depósito, desalojo, contrato'},
+  {id:'deudas', label:'Deudas y consumo', hint:'Me cobran algo que no debo, una compra salió mal'},
+  {id:'accidentes', label:'Accidentes y daños', hint:'Choque, accidente en el trabajo o en la calle'},
+  {id:'herencias', label:'Herencias', hint:'Murió un familiar, sucesión'},
+  {id:'penal', label:'Penal', hint:'Me denunciaron o quiero denunciar'},
+  {id:'negocio', label:'Mi negocio', hint:'Contratos, socios, proveedores'},
+  {id:'nose', label:'No sé', hint:'Te hacemos tres preguntas y lo ubicamos'}
+];
+const TEMAS_RAPIDOS = [
+  ['trabajo','Me despidieron'],['familia','Me separo'],['alquiler','Problemas con el alquiler'],
+  ['deudas','Me quieren cobrar una deuda'],['accidentes','Tuve un accidente'],['herencias','Murió un familiar']
+];
+const PREGUNTAS = {
+  trabajo:[['¿Seguís trabajando ahí?',['Sí','No, me despidieron','Renuncié']],['¿Estabas registrado (en blanco)?',['Sí','No','En parte','No sé']]],
+  familia:[['¿Qué te preocupa más?',['Cuota alimentaria','Régimen de visitas','Divorcio','Otro']],['¿Hay hijos menores de edad?',['Sí','No']]],
+  alquiler:[['¿Sos inquilino o propietario?',['Inquilino','Propietario']],['¿Tenés contrato escrito?',['Sí','No','No sé']]],
+  deudas:[['¿Quién te reclama?',['Banco o tarjeta','Estudio de cobranzas','Un comercio','Otro']],['¿Te llegó algo por escrito?',['Sí','No']]],
+  accidentes:[['¿Qué tipo de accidente?',['De tránsito','En el trabajo','En la calle o en un comercio']],['¿Hubo lesiones?',['Sí','No']]],
+  herencias:[['¿Ya se inició la sucesión?',['Sí','No','No sé']],['¿Están de acuerdo los herederos?',['Sí','No','No sé']]],
+  penal:[['¿Sos víctima o te acusan de algo?',['Soy víctima','Me acusan','Otro']],['¿Hay alguien detenido en este momento?',['Sí','No']]],
+  negocio:[['¿Sobre qué es?',['Contrato con un cliente o proveedor','Socios','Marca o nombre','Otro']],['¿Hay una fecha límite?',['Sí','No']]],
+  nose:[['¿Con quién es el problema?',['Mi empleador','Mi familia o pareja','Un dueño o inquilino','Una empresa o banco','Otro']],['¿Ya pasó algo grave o puede pasar pronto?',['Sí','No']]]
+};
+const PROVINCIAS = ['Buenos Aires','Catamarca','Chaco','Chubut','Ciudad de Buenos Aires','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán'];
+const PLAZOS = ['No tengo fecha límite','Tengo una fecha en más de 10 días','Vence en menos de 10 días','Vence en 48 horas o menos'];
+
+const ABOGADOS = [
+  {id:'a1',nombre:'Dra. Lucía Ferreyra',ini:'LF',colegio:'Colegio Público de la Abogacía de la Capital Federal',corto:'CPACF',mat:'T° 118 F° 402',juris:'Ciudad de Buenos Aires',anios:9,temas:['trabajo','accidentes','nose'],esp:[['Derecho laboral',true],['Accidentes de trabajo',false]],modo:'Video y presencial',consulta:'$ 45.000',resp:'4 h',rep:[4.8,4.9,4.6,4.8],resenas:23,acepta:true,verif:'12/10/2026',bio:'Trabajo con despidos, registración y reclamos ante la ART. Antes de empezar te explico los pasos, los plazos y cuánto cuesta cada etapa.'},
+  {id:'a2',nombre:'Dr. Martín Quiroga',ini:'MQ',colegio:'Colegio de Abogados y Procuradores de Neuquén',corto:'CAPN',mat:'Mat. 3.214',juris:'Neuquén',anios:14,temas:['familia','herencias','nose'],esp:[['Familia',true],['Sucesiones',true]],modo:'Video y presencial',consulta:'$ 40.000',resp:'9 h',rep:[4.7,4.8,4.3,4.7],resenas:31,acepta:false,verif:'03/10/2026',bio:'Acompaño separaciones, cuota alimentaria y sucesiones. Busco primero un acuerdo y, si no se puede, vamos a juicio con todo explicado.'},
+  {id:'a3',nombre:'Dra. Valentina Sosa',ini:'VS',colegio:'Colegio de Abogados de San Isidro',corto:'CASI',mat:'T° XII F° 77',juris:'Buenos Aires (San Isidro)',anios:6,temas:['alquiler','deudas','nose'],esp:[['Locaciones',true],['Defensa del consumidor',false]],modo:'Solo video',consulta:'$ 38.000',resp:'2 h',rep:[4.9,4.8,4.9,4.7],resenas:17,acepta:true,verif:'15/10/2026',bio:'Inquilinos, propietarios y reclamos de consumo. Reviso tu contrato y te digo con claridad qué podés reclamar y qué no.'},
+  {id:'a4',nombre:'Dr. Esteban Ríos',ini:'ER',colegio:'Colegio de Abogados de Córdoba',corto:'CAC',mat:'Mat. 1-38211',juris:'Córdoba',anios:18,temas:['penal','negocio'],esp:[['Derecho penal',true],['Derecho penal económico',false]],modo:'Presencial',consulta:'$ 50.000',resp:'12 h',rep:[4.6,4.7,4.2,4.8],resenas:40,acepta:false,verif:'28/09/2026',bio:'Defensas penales y asistencia a víctimas. Atiendo consultas con turno; las urgencias con personas detenidas van por la ruta urgente.'},
+  {id:'a5',nombre:'Dra. Camila Benítez',ini:'CB',colegio:'Colegio Público de la Abogacía de la Capital Federal',corto:'CPACF',mat:'T° 131 F° 88',juris:'Ciudad de Buenos Aires',anios:5,temas:['familia','alquiler','nose'],esp:[['Familia',false],['Locaciones',false]],modo:'Video y presencial',consulta:'$ 38.000',resp:'5 h',rep:[4.7,4.9,4.7,4.6],resenas:9,acepta:true,verif:'10/10/2026',bio:'Familia y vivienda. Escucho primero, después te propongo opciones con sus costos por escrito.'},
+  {id:'a6',nombre:'Dr. Hernán Ibarra',ini:'HI',colegio:'Colegio de Abogados de Rosario',corto:'CAR',mat:'T° LV F° 21',juris:'Santa Fe (Rosario)',anios:11,temas:['negocio','deudas','trabajo'],esp:[['Derecho comercial',true],['Derecho laboral',false]],modo:'Video y presencial',consulta:'$ 42.000',resp:'7 h',rep:[4.5,4.6,4.4,4.7],resenas:14,acepta:false,verif:'01/10/2026',bio:'Pymes y comercios: contratos, conflictos entre socios y cobranzas. También despidos del lado del trabajador.'},
+  {id:'a7',nombre:'Dra. Rocío Medina',ini:'RM',colegio:'Colegio Público de la Abogacía de la Capital Federal',corto:'CPACF',mat:'T° 102 F° 640',juris:'Ciudad de Buenos Aires',anios:12,temas:['accidentes','deudas','herencias'],esp:[['Daños y perjuicios',true],['Seguros',true]],modo:'Video y presencial',consulta:'$ 45.000',resp:'3 h',rep:[4.8,4.7,4.8,4.9],resenas:28,acepta:true,verif:'14/10/2026',bio:'Accidentes de tránsito, reclamos a aseguradoras y daños. Te digo qué documentación juntar desde el primer día.'}
+];
+const RESENAS = [
+  ['Me explicó todo sin palabras raras y me pasó el presupuesto por escrito antes de empezar.','Gracias. Siempre trabajo así.'],
+  ['Respondió rápido y cumplió con lo que habíamos acordado.',null]
+];
+
+const CASOS = [
+  {id:'c1',tema:'Trabajo',sub:'Despido',frase:'Me despidieron de [empleador] sin pagarme el último mes ni la indemnización. Trabajé 4 años sin estar registrado.',region:'Ciudad de Buenos Aires',plazo:'Sin fecha límite',hace:'hace 2 h',resp:['Ya no trabaja ahí','No estaba registrado'],interesado:true,cliente:'Cliente de Trabajo'},
+  {id:'c2',tema:'Alquiler y vivienda',sub:'Depósito',frase:'El dueño no me quiere devolver el depósito y me pide pagar arreglos que ya estaban cuando entré.',region:'Buenos Aires, Dpto. judicial San Isidro',plazo:'Sin fecha límite',hace:'hace 5 h',resp:['Inquilino','Tiene contrato escrito'],interesado:false,cliente:'Cliente de Alquiler'},
+  {id:'c3',tema:'Familia',sub:'Cuota alimentaria',frase:'No recibo la cuota alimentaria de mis hijos desde hace 5 meses. El padre dice que no tiene trabajo.',region:'Patagonia norte',regionNota:'Ubicación generalizada: localidad con pocos habitantes',plazo:'Sin fecha límite',hace:'hace 1 día',resp:['Cuota alimentaria','Hay hijos menores'],interesado:true,sinCuotaLitis:true,cliente:'Cliente de Familia'},
+  {id:'c4',tema:'Deudas y consumo',sub:'Cobranza',frase:'Me llama un estudio de cobranzas por una tarjeta que di de baja en [fecha]. Ahora me llegó una intimación.',region:'Córdoba',plazo:'Vence en menos de 10 días',urgente:true,hace:'hace 3 h',resp:['Estudio de cobranzas','Le llegó algo por escrito'],interesado:false,cliente:'Cliente de Deudas'},
+  {id:'c5',tema:'Accidentes y daños',sub:'Tránsito',frase:'Choqué con la moto y el seguro del otro auto no me responde hace dos meses.',region:'Ciudad de Buenos Aires',plazo:'Sin fecha límite',hace:'hace 6 h',resp:['De tránsito','Hubo lesiones'],interesado:true,cliente:'Cliente de Accidentes'}
+];
+
+const RESP_ABOGADO = [
+  'Hola, gracias por escribir. Contame cuándo empezó el problema y si tenés algún papel: recibos, carta documento o contrato.',
+  'Perfecto. Podemos hacer una primera consulta por video esta semana. Antes te paso el presupuesto por escrito.',
+  'Anotado. En la consulta vemos los plazos y qué conviene hacer primero.'
+];
+const RESP_CLIENTE = [
+  'Hola, gracias por responder. Tengo los recibos y algunos mensajes de WhatsApp.',
+  '¿Cuánto saldría la primera consulta?',
+  'Dale, me sirve. Gracias.'
+];
+const HORARIOS = ['Jueves 10:00 por video','Jueves 18:30 por video','Viernes 12:00 presencial'];
+
+/* =========================================================
+   Estado
+   ========================================================= */
+function estadoInicial(){
+  return {
+    rol:'cliente',
+    cliente:{vista:'inicio',paso:0,caso:null,borrador:nuevoBorrador(),consentSens:false,consentTyc:false,tel:'',otpEnviado:false,likes:5,indice:0,orden:null,pendientes:[],chats:[],chatAbierto:null},
+    abogado:{vista:'casos',verificado:false,indice:0,ayudados:[],chats:[],chatAbierto:null,plan:'basico',cupo:5,honorario:'45000',bio:'Trabajo con despidos y reclamos laborales. Te explico los pasos y los costos antes de empezar.',cuotaLitis:false},
+    estudio:{vista:'bandeja',asignaciones:{},descartados:[],ayudados:[],chats:[],chatAbierto:null,equipo:[
+      {id:'m1',nombre:'Dra. Ana Torres',ini:'AT',rol:'Socia',mat:'CPACF T° 95 F° 310',esp:'Laboral',estado:'ok'},
+      {id:'m2',nombre:'Dr. Pablo Giménez',ini:'PG',rol:'Asociado',mat:'CASI T° X F° 12',esp:'Civil y alquileres',estado:'ok'},
+      {id:'m3',nombre:'Dra. Sofía Luna',ini:'SL',rol:'Asociada',mat:'CPACF T° 140 F° 19',esp:'Familia',estado:'pend'}
+    ]}
+  };
+}
+function nuevoBorrador(){return {tema:null,resp:[null,null],frase:'',provincia:'',localidad:'',plazo:null,tieneAbogado:null}}
+let S = estadoInicial();
+let sealN = 0;
+
+/* =========================================================
+   Utilidades
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const temaLabel = id => (TEMAS.find(t=>t.id===id)||{}).label || '';
+const abogado = id => ABOGADOS.find(a=>a.id===id);
+
+function seal(corto, pendiente){
+  const id = 'sello' + (++sealN);
+  const txt = pendiente ? 'EN VERIFICACIÓN · ' + corto + ' · ' : 'MATRÍCULA VERIFICADA · ' + corto + ' · ';
+  return `<svg class="seal${pendiente?' pendiente':''}" viewBox="0 0 100 100" aria-hidden="true">
+    <defs><path id="${id}" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs>
+    <circle cx="50" cy="50" r="48" class="anillo"/>
+    <circle cx="50" cy="50" r="27" class="nucleo"/>
+    <text class="texto-sello"><textPath href="#${id}">${esc(txt)}</textPath></text>
+    ${pendiente ? '<circle cx="50" cy="50" r="5" fill="#fff"/>' : '<path class="tilde" d="M38 51 l8 8 l16 -18"/>'}
+  </svg>`;
+}
+
+/* Anonimizador: reglas simples para la demo */
+function anonimizar(texto){
+  let t = texto;
+  const hallados = [];
+  const reglas = [
+    [/[\w.+-]+@[\w-]+\.[\w.]+/g,'[email]'],
+    [/\b\d{22}\b/g,'[CBU]'],
+    [/\b\d{2}-?\d{8}-?\d\b/g,'[CUIT]'],
+    [/\b\d{1,2}\.\d{3}\.\d{3}\b|\b\d{7,8}\b/g,'[DNI]'],
+    [/(\+?54\s?)?(9\s?)?\(?\d{2,4}\)?[\s-]?\d{3,4}[\s-]\d{4}\b/g,'[teléfono]'],
+    [/\b[A-Z]{2}\s?\d{3}\s?[A-Z]{2}\b|\b[A-Z]{3}\s?\d{3}\b/g,'[patente]'],
+    [/\b(calle|av\.|avenida|pasaje|barrio)\s+[A-ZÁÉÍÓÚÑa-záéíóúñ.]+(\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)*(\s+\d{1,5})?/gi,'[domicilio]'],
+    [/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g,'[fecha]']
+  ];
+  reglas.forEach(([re,rep])=>{ t = t.replace(re, m => { hallados.push(m); return rep; }); });
+  // Nombres propios: palabras con mayúscula que no inician oración
+  const comunes = new Set(['No','Sí','Me','Mi','Mis','El','La','Los','Las','Un','Una','Hace','Ahora','Ya','Yo','Hoy','Ayer','Desde','Cuando','Pero','Y','En','De','Lo','Le','Les','Se','Tengo','Trabajé','Soy']);
+  t = t.replace(/(^|[.!?]\s+|\s)([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)*)/g, (m, antes, palabra, offset, full) => {
+    const inicioOracion = antes === '' || /[.!?]\s+$/.test(antes);
+    if (inicioOracion || comunes.has(palabra) || PROVINCIAS.includes(palabra)) return m;
+    hallados.push(palabra);
+    return antes + '[nombre]';
+  });
+  return {texto:t, hallados};
+}
+function resaltarMarcas(t){
+  return esc(t).replace(/\[(email|CBU|CUIT|DNI|teléfono|patente|domicilio|fecha|nombre|empleador)\]/g, m => `<span class="marca-dato">${m}</span>`);
+}
+function esUrgente(b){
+  const claves = /(me pega|me golpe|golpe[oó]|violencia|amenaz|detenid|preso|me quiere matar|abus[oa]|me encerr)/i;
+  if (claves.test(b.frase)) return true;
+  if (b.plazo === PLAZOS[3]) return true;
+  if (b.tema === 'penal' && b.resp[1] === 'Sí') return true;
+  return false;
+}
+function ordenJusto(tema){
+  const afines = ABOGADOS.filter(a=>a.temas.includes(tema));
+  const resto = ABOGADOS.filter(a=>!a.temas.includes(tema));
+  const mezclar = arr => arr.map(a=>[Math.random(),a]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+  return [...mezclar(afines), ...mezclar(resto)].map(a=>a.id);
+}
+let toastTimer;
+function toast(msg){
+  const capa = $('#telefono');
+  const prev = capa.querySelector('.toast'); if (prev) prev.remove();
+  const el = document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.textContent = msg;
+  capa.appendChild(el);
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.remove(), 3200);
+}
+
+/* =========================================================
+   Notas del panel lateral
+   ========================================================= */
+const NOTAS = {
+  'cliente:inicio':['Home de la persona','<p>Una sola acción principal y una salida de emergencia. No hace falta crear cuenta para empezar.</p><ul><li>Accesos por tema en lenguaje cotidiano.</li><li>Franja de confianza: matrícula verificada con cada colegio.</li><li>Pie con aviso de directorio y botones de arrepentimiento y de baja (Disposición 954/2025).</li></ul>'],
+  'cliente:wizard':['Carga de caso en 5 pasos','<p>Una pregunta por pantalla, sin términos jurídicos. Si el relato o las respuestas indican una emergencia, el flujo se corta y aparece la ruta urgente.</p><p style="margin-top:8px">Probá escribir <strong>"me amenaza"</strong> en el paso 3 o elegir <strong>"Vence en 48 horas o menos"</strong>.</p>'],
+  'cliente:urgente':['Ruta urgente','<p>Una emergencia nunca entra al mazo de tarjetas. Se muestran líneas públicas y la defensa pública, y la persona decide si igual quiere seguir.</p>'],
+  'cliente:preview':['Anonimización y consentimiento','<p>La persona ve el caso tal como lo verán los abogados, con los datos personales reemplazados. El texto original queda en una bóveda separada.</p><ul><li>Consentimiento expreso para datos sensibles (Ley 25.326), sin casillas premarcadas.</li><li>Verificación del teléfono para frenar casos falsos.</li></ul><p style="margin-top:8px">Probá escribir un DNI, un email o un nombre propio en la frase.</p>'],
+  'cliente:mazo':['Mazo de abogados','<p>Solo matrículas activas en la jurisdicción. El orden es por afinidad y, entre iguales, aleatorio: no hay lugares pagos.</p><ul><li>Deslizá a la derecha o tocá "Me interesa".</li><li>Hay un tope de 5 "Me interesa" por caso.</li><li>En la demo, Ferreyra, Sosa, Benítez y Medina ya marcaron que pueden ayudar: con ellas hay match inmediato.</li></ul>'],
+  'cliente:caso':['Tu caso','<p>Estado del caso, abogados pendientes de respuesta y la opción de borrar todo. Los casos sin match se borran solos a los 90 días.</p>'],
+  'cliente:chats':['Chats','<p>El chat se abre recién con el match. La persona decide cuándo compartir su identidad; el nombre de la contraparte se comparte solo con ese abogado, para que controle conflictos de intereses.</p>'],
+  'abogado:casos':['Mazo de casos del abogado','<p>El abogado ve solo casos anonimizados de su jurisdicción y especialidad. Marca "Puedo ayudar" o "Paso".</p><ul><li>Si la persona ya marcó interés, se abre el match.</li><li>Cupo semanal según el plan: el precio nunca depende de cuántos clientes consigue (Ley 23.187, art. 10 inc. f).</li><li>En casos de alimentos se avisa que la cuota litis no está permitida (Ley 27.423, art. 6).</li></ul>'],
+  'abogado:verificacion':['Verificación de matrícula','<p>Ningún perfil aparece hasta que el colegio confirma la matrícula activa. Identidad con selfie y DNI, matrícula contra el padrón del colegio, revalidación cada 6 meses.</p><p style="margin-top:8px">Tocá "Simular respuesta del colegio" para continuar.</p>'],
+  'abogado:chats':['Chats del abogado','<p>Mismo chat cifrado que ve la persona. El abogado propone horarios para la primera consulta y debe enviar el presupuesto por escrito.</p>'],
+  'abogado:perfil':['Perfil y reglas de publicidad','<p>El perfil tiene plantilla sobria y moderación automática:</p><ul><li>Sin promesas de resultado ni superlativos (Código de Ética CPACF, arts. 10 y 19).</li><li>El honorario de consulta no puede ser menor al mínimo arancelario (Ley 27.423, art. 5).</li><li>Planes con cuota fija, sin pago por caso.</li></ul><p style="margin-top:8px">Probá escribir "te garantizo el mejor resultado" en la presentación.</p>'],
+  'estudio:bandeja':['Bandeja del estudio','<p>El estudio recibe casos como equipo y asigna cada uno a un abogado verificado. Sin asignación no puede responder "Puedo ayudar".</p><ul><li>Quien está en verificación no puede recibir casos.</li><li>El estudio muestra siempre a sus abogados responsables (Ley 27.423, art. 62).</li></ul>'],
+  'estudio:equipo':['Equipo','<p>Cada integrante se verifica de forma individual con su colegio. El estudio es una cuenta que agrupa matrículas ya verificadas.</p><p style="margin-top:8px">Invitá a alguien y simulá su verificación.</p>'],
+  'estudio:chats':['Chats del estudio','<p>Cada conversación queda a nombre del estudio y del abogado asignado, que es el responsable profesional frente al cliente.</p>'],
+  'estudio:plan':['Plan del estudio','<p>Cuota fija por abogado del equipo. Nunca comisión por caso, pago por contacto ni porcentaje de honorarios.</p>']
+};
+
+/* =========================================================
+   Render
+   ========================================================= */
+function render(){
+  sealN = 0;
+  document.querySelectorAll('.roles button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.rol===S.rol ? 'true':'false'));
+  const p = $('#pantalla');
+  let html = '';
+  if (S.rol==='cliente') html = renderCliente();
+  if (S.rol==='abogado') html = renderAbogado();
+  if (S.rol==='estudio') html = renderEstudio();
+  p.innerHTML = html;
+  renderPestanas();
+  renderNota();
+  activarMazo();
+  const m = p.querySelector('.mensajes'); if (m) m.scrollTop = m.scrollHeight;
+}
+
+function renderPestanas(){
+  const nav = $('#pestanas');
+  let tabs = [];
+  if (S.rol==='cliente'){
+    const c = S.cliente;
+    const enCaso = ['wizard','preview','urgente'].includes(c.vista) ? 'inicio' : (c.vista==='mazo' ? 'caso' : c.vista);
+    tabs = [['inicio','Inicio'],['caso','Mi caso'],['chats','Chats', c.chats.length>0]];
+    nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${enCaso===v||(v==='chats'&&c.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
+  } else if (S.rol==='abogado'){
+    const a = S.abogado;
+    tabs = [['casos','Casos'],['chats','Chats', a.chats.length>0],['perfil','Perfil']];
+    nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${a.vista===v||(v==='chats'&&a.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
+  } else {
+    const e = S.estudio;
+    tabs = [['bandeja','Bandeja'],['equipo','Equipo'],['chats','Chats', e.chats.length>0],['plan','Plan']];
+    nav.innerHTML = tabs.map(([v,l,p])=>`<button data-action="tab" data-vista="${v}" ${e.vista===v||(v==='chats'&&e.vista==='chat')?'aria-current="page"':''}>${l}${p?'<span class="punto" aria-hidden="true"></span>':''}</button>`).join('');
+  }
+}
+
+function renderNota(){
+  let clave = S.rol + ':' + S[S.rol].vista;
+  if (clave==='cliente:chat') clave='cliente:chats';
+  if (clave==='abogado:chat') clave='abogado:chats';
+  if (clave==='estudio:chat') clave='estudio:chats';
+  if (S.rol==='abogado' && S.abogado.vista==='casos' && !S.abogado.verificado) clave='abogado:verificacion';
+  const n = NOTAS[clave] || ['Qué estás viendo',''];
+  $('#nota-titulo').textContent = n[0];
+  $('#nota-cuerpo').innerHTML = n[1];
+}
+
+/* ---------------- Cliente ---------------- */
+function renderCliente(){
+  const c = S.cliente;
+  if (c.vista==='inicio') return vistaInicio();
+  if (c.vista==='wizard') return vistaWizard();
+  if (c.vista==='urgente') return vistaUrgente();
+  if (c.vista==='preview') return vistaPreview();
+  if (c.vista==='mazo') return vistaMazo();
+  if (c.vista==='caso') return c.caso ? vistaMiCaso() : vistaSinCaso();
+  if (c.vista==='chats') return vistaListaChats(c.chats,'cliente');
+  if (c.vista==='chat') return vistaChat('cliente');
+  return '';
+}
+
+function vistaInicio(){
+  const c = S.cliente;
+  const casoActivo = c.caso ? `
+    <button class="item" data-action="tab" data-vista="caso">
+      <div class="cuerpo"><strong>Tu caso de ${esc(temaLabel(c.caso.tema))}</strong><span>${c.chats.length? c.chats.length+' match · ' : ''}${c.pendientes.length} esperando respuesta</span></div>
+      <span class="estado ok">Activo</span>
+    </button>` : '';
+  return `<div class="pila-g">
+    ${casoActivo}
+    <section class="hero">
+      <h1>Contanos qué te pasa.</h1>
+      <p>Te mostramos abogados con matrícula verificada que pueden ayudarte. Sin vueltas y sin palabras raras.</p>
+    </section>
+    <div class="pila">
+      <button class="btn btn-principal btn-bloque" data-action="empezar">${c.caso ? 'Contar otro caso' : 'Empezar'}</button>
+      <button class="btn btn-alerta btn-bloque" data-action="urgente">Es urgente</button>
+    </div>
+    <section class="pila" aria-labelledby="t-temas">
+      <h2 class="titulo-chico" id="t-temas">O elegí lo que más se parece</h2>
+      <div class="temas-rapidos">
+        ${TEMAS_RAPIDOS.map(([id,l])=>`<button class="tema-rapido" data-action="empezar" data-tema="${id}">${l}</button>`).join('')}
+      </div>
+    </section>
+    <div class="franja">
+      ${seal('CPACF')}
+      <div><strong>Todos los abogados tienen matrícula verificada</strong><p class="texto-3">Cruzamos sus datos con el colegio de cada jurisdicción. <button class="btn-texto" data-action="como-verificamos">Cómo verificamos</button></p></div>
+    </div>
+    <footer class="pie-legal">
+      Justa es un directorio de profesionales. No brinda asesoramiento legal ni es un estudio jurídico.
+      <div class="enlaces">
+        <button data-action="legal" data-doc="tyc">Términos</button>
+        <button data-action="legal" data-doc="priv">Privacidad</button>
+        <button class="boton-legal" data-action="legal" data-doc="arrep">Botón de arrepentimiento</button>
+        <button class="boton-legal" data-action="legal" data-doc="baja">Botón de baja</button>
+      </div>
+    </footer>
+  </div>`;
+}
+
+function vistaWizard(){
+  const c = S.cliente, b = c.borrador, paso = c.paso;
+  const barra = `<div class="progreso" aria-hidden="true">${[0,1,2,3,4].map(i=>`<span class="${i<=paso?'hecho':''}"></span>`).join('')}</div><p class="paso-de">Paso ${paso+1} de 5</p>`;
+  let cuerpo = '', listo = false;
+  if (paso===0){
+    cuerpo = `<h1 class="titulo">¿Qué tipo de problema tenés?</h1>
+      <div class="opciones">${TEMAS.map(t=>`<button class="opcion" data-action="elegir-tema" data-tema="${t.id}" aria-pressed="${b.tema===t.id}"><strong>${t.label}</strong><small>${t.hint}</small></button>`).join('')}</div>`;
+    listo = !!b.tema;
+  }
+  if (paso===1){
+    const qs = PREGUNTAS[b.tema] || PREGUNTAS.nose;
+    cuerpo = `<h1 class="titulo">Dos preguntas rápidas</h1>
+      ${qs.map((q,i)=>`<div><p class="pregunta">${q[0]}</p><div class="opciones ${q[1].length<=3?'':'dos'}">${q[1].map(o=>`<button class="opcion" data-action="elegir-resp" data-i="${i}" data-valor="${esc(o)}" aria-pressed="${b.resp[i]===o}">${esc(o)}</button>`).join('')}</div></div>`).join('')}`;
+    listo = b.resp[0] && b.resp[1];
+  }
+  if (paso===2){
+    cuerpo = `<h1 class="titulo">Contalo en una frase</h1>
+      <div class="aviso aviso-lacre">No pongas nombres, DNI ni direcciones. Los abogados van a ver un resumen sin datos personales.</div>
+      <div class="campo">
+        <label for="frase">¿Qué pasó?</label>
+        <textarea id="frase" maxlength="280" data-input="frase" placeholder="Por ejemplo: me echaron sin pagarme el último mes">${esc(b.frase)}</textarea>
+        <div class="contador"><span id="cont">${b.frase.length}</span> de 280</div>
+      </div>`;
+    listo = b.frase.trim().length >= 10;
+  }
+  if (paso===3){
+    cuerpo = `<h1 class="titulo">¿Dónde es?</h1>
+      <p class="texto-2">Con esto sabemos qué colegio de abogados corresponde.</p>
+      <div class="campo"><label for="prov">Provincia</label>
+        <select id="prov" data-input="provincia"><option value="">Elegí una provincia</option>${PROVINCIAS.map(p=>`<option ${b.provincia===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="campo"><label for="loc">Localidad o barrio</label>
+        <input id="loc" data-input="localidad" value="${esc(b.localidad)}" placeholder="Por ejemplo: Caballito" autocomplete="address-level2"></div>
+      <p class="ayuda">Si tu localidad es chica, los abogados solo van a ver la región.</p>`;
+    listo = !!b.provincia;
+  }
+  if (paso===4){
+    cuerpo = `<h1 class="titulo">Dos datos más</h1>
+      <div><p class="pregunta">¿Tenés una fecha límite?</p><div class="opciones">${PLAZOS.map(o=>`<button class="opcion" data-action="elegir-plazo" data-valor="${esc(o)}" aria-pressed="${b.plazo===o}">${esc(o)}</button>`).join('')}</div></div>
+      <div><p class="pregunta">¿Ya tenés abogado para esto?</p><div class="opciones dos">${['No','Sí, quiero una segunda opinión'].map(o=>`<button class="opcion" data-action="elegir-abogado" data-valor="${esc(o)}" aria-pressed="${b.tieneAbogado===o}">${esc(o)}</button>`).join('')}</div></div>
+      ${b.tieneAbogado && b.tieneAbogado!=='No' ? '<div class="aviso aviso-info">Podés pedir una segunda opinión. Si cambiás de abogado, el nuevo profesional tiene que avisarle al anterior.</div>' : ''}`;
+    listo = b.plazo && b.tieneAbogado;
+  }
+  return `<div class="pila-g">
+    <div>${barra}</div>
+    <div class="pila-g">${cuerpo}</div>
+    <div class="acciones-fijas fila-btns">
+      <button class="btn btn-sec" data-action="wiz-atras">Volver</button>
+      <button class="btn btn-principal" data-action="wiz-sig" ${listo?'':'disabled'} id="btn-sig">${paso===4?'Ver mi resumen':'Seguir'}</button>
+    </div>
+  </div>`;
+}
+
+function vistaUrgente(){
+  const desdeWizard = S.cliente.borrador.tema !== null;
+  return `<div class="pila-g">
+    <h1 class="titulo">Si es urgente, pedí ayuda ahora</h1>
+    <p class="texto-2">Justa no atiende emergencias. Estos servicios públicos sí, y son gratuitos.</p>
+    <div class="pila">
+      <a class="item multi" href="tel:911"><div class="cuerpo"><strong>911</strong><span>Emergencias y seguridad, todo el país</span></div></a>
+      <a class="item multi" href="tel:144"><div class="cuerpo"><strong>144</strong><span>Violencia de género, 24 horas, gratuita</span></div></a>
+      <a class="item multi" href="tel:137"><div class="cuerpo"><strong>137</strong><span>Violencia familiar y sexual (según provincia)</span></div></a>
+      <a class="item multi" href="tel:102"><div class="cuerpo"><strong>102</strong><span>Derechos de niñas, niños y adolescentes (según provincia)</span></div></a>
+      <div class="item multi"><div class="cuerpo"><strong>Defensa pública</strong><span>Si hay una persona detenida, pedí un defensor oficial</span></div></div>
+      <div class="item multi"><div class="cuerpo"><strong>Consultorio gratuito del colegio</strong><span>Patrocinio sin costo si no podés pagar un abogado</span></div></div>
+    </div>
+    <div class="aviso aviso-info">Si ya estás a salvo y querés buscar un abogado para después, podés seguir.</div>
+    <div class="pila">
+      ${desdeWizard ? '<button class="btn btn-sec btn-bloque" data-action="urgente-seguir">No es una emergencia, seguir</button>' : ''}
+      <button class="btn btn-sec btn-bloque" data-action="tab" data-vista="inicio">Volver al inicio</button>
+    </div>
+  </div>`;
+}
+
+function vistaPreview(){
+  const c = S.cliente, b = c.borrador;
+  const an = anonimizar(b.frase);
+  const region = regionPublica(b.provincia, b.localidad);
+  const urg = b.plazo===PLAZOS[2] ? '<span class="chip chip-alerta">Plazo en menos de 10 días</span>' : '';
+  const puede = c.consentSens && c.consentTyc;
+  return `<div class="pila-g">
+    <div><h1 class="titulo">Así lo van a ver los abogados</h1><p class="texto-2" style="margin-top:6px">Revisalo. Si algo te identifica, editalo.</p></div>
+    <article class="tarjeta-caso" aria-label="Vista previa del caso anonimizado">
+      <div class="chips"><span class="chip chip-lacre">${esc(temaLabel(b.tema))}</span><span class="chip">${esc(region)}</span>${urg}</div>
+      <p class="frase">${resaltarMarcas(an.texto)}</p>
+      <div class="chips">${b.resp.map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
+    </article>
+    ${an.hallados.length ? `<div class="aviso aviso-ok"><strong>Ocultamos ${an.hallados.length} ${an.hallados.length===1?'dato':'datos'} personal${an.hallados.length===1?'':'es'}.</strong><p class="original" style="margin-top:4px">${an.hallados.map(h=>`<s>${esc(h)}</s>`).join(', ')}</p></div>` : `<div class="aviso aviso-info">No encontramos datos personales en tu frase.</div>`}
+    <button class="btn btn-sec btn-bloque" data-action="editar-frase">Editar la frase</button>
+    <label class="check"><input type="checkbox" data-action="consent" data-cual="sens" ${c.consentSens?'checked':''}><span>Mi caso puede incluir información de salud, familia u otros datos sensibles. Acepto que Justa la guarde cifrada solo para conectarme con abogados.</span></label>
+    <label class="check"><input type="checkbox" data-action="consent" data-cual="tyc" ${c.consentTyc?'checked':''}><span>Entiendo que Justa es un directorio, no un estudio jurídico, y acepto los <button class="btn-texto" data-action="legal" data-doc="tyc">Términos</button>.</span></label>
+    <div class="pila">
+      <div class="campo"><label for="tel">Tu celular, para verificar que sos una persona real</label>
+        <input id="tel" data-input="tel" inputmode="tel" value="${esc(c.tel)}" placeholder="11 2345 6789"></div>
+      <p class="ayuda">No se lo mostramos a ningún abogado hasta que vos lo compartas.</p>
+    </div>
+    <div class="acciones-fijas">
+      <button class="btn btn-principal btn-bloque" data-action="enviar-codigo" ${puede?'':'disabled'} id="btn-codigo">Recibir código</button>
+    </div>
+  </div>`;
+}
+function regionPublica(prov, loc){
+  if (!prov) return '';
+  const chicas = /(villa|san martín de los andes|junín de los andes|aluminé|el bolsón|tafí|purmamarca|cafayate|chos malal|trevelin|el calafate|el chaltén)/i;
+  if (loc && chicas.test(loc)) return prov + ' (región)';
+  if (prov==='Ciudad de Buenos Aires') return prov;
+  return loc ? prov + ', ' + loc : prov;
+}
+
+function vistaMazo(){
+  const c = S.cliente;
+  const ids = c.orden || [];
+  const restantes = ids.slice(c.indice);
+  if (!restantes.length || c.likes===0){
+    return `<div class="vacio"><h2>${c.likes===0?'Usaste tus 5 "Me interesa"':'Viste todos los abogados disponibles'}</h2>
+      <p>${c.pendientes.length} esperando respuesta y ${c.chats.length} con match. Te avisamos cuando alguien responda.</p>
+      <div class="pila" style="margin-top:20px"><button class="btn btn-principal btn-bloque" data-action="tab" data-vista="caso">Ver mi caso</button>${c.chats.length?'<button class="btn btn-sec btn-bloque" data-action="tab" data-vista="chats">Ir a los chats</button>':''}</div></div>`;
+  }
+  const actual = abogado(restantes[0]);
+  const siguiente = restantes[1] ? abogado(restantes[1]) : null;
+  return `<div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <h1 class="titulo-chico">Abogados para tu caso</h1>
+      <button class="btn-texto" data-action="por-que" style="font-size:14px">Por qué veo estos</button>
+    </div>
+    <div class="mazo" id="mazo">
+      ${siguiente ? cartaAbogado(siguiente, true) : ''}
+      ${cartaAbogado(actual, false)}
+    </div>
+    <div class="controles-mazo">
+      <button class="btn btn-sec btn-redondo" data-action="pasar" aria-label="Pasar a ${esc(actual.nombre)}">Paso</button>
+      <button class="btn btn-sec btn-redondo" data-action="ver-perfil" data-id="${actual.id}">Perfil</button>
+      <button class="btn btn-principal btn-redondo" data-action="me-interesa" aria-label="Me interesa ${esc(actual.nombre)}">Me interesa</button>
+    </div>
+    <p class="contador-likes">Te quedan ${c.likes} "Me interesa" para este caso</p>
+  </div>`;
+}
+function cartaAbogado(a, detras){
+  const prom = (a.rep.reduce((x,y)=>x+y,0)/a.rep.length).toFixed(1).replace('.',',');
+  return `<article class="carta${detras?' detras':''}" ${detras?'aria-hidden="true"':'id="carta-actual" tabindex="0" aria-label="'+esc(a.nombre)+'. Deslizá a la derecha si te interesa."'}>
+    <span class="etiqueta-swipe si" aria-hidden="true">Me interesa</span>
+    <span class="etiqueta-swipe no" aria-hidden="true">Paso</span>
+    <div class="sello-pos">${seal(a.corto)}</div>
+    <div class="avatar" aria-hidden="true">${a.ini}</div>
+    <h2>${esc(a.nombre)}</h2>
+    <p class="matricula">${esc(a.corto)} ${esc(a.mat)} · verificada el ${a.verif}</p>
+    <div class="chips" style="margin-top:10px">${a.esp.map(([n,comp])=>`<span class="chip ${comp?'chip-ok':''}">${esc(n)}${comp?', comprobada':''}</span>`).join('')}</div>
+    <dl class="datos">
+      <div><dt>Años de matrícula</dt><dd>${a.anios}</dd></div>
+      <div><dt>Primera consulta</dt><dd>${a.consulta}</dd></div>
+      <div><dt>Reputación</dt><dd>${prom} de 5 (${a.resenas} reseñas verificadas)</dd></div>
+      <div><dt>Responde en</dt><dd>${a.resp} promedio</dd></div>
+    </dl>
+    <p class="bio">${esc(a.bio)}</p>
+    <p class="texto-3">${esc(a.modo)} · ${esc(a.juris)}</p>
+  </article>`;
+}
+
+function vistaMiCaso(){
+  const c = S.cliente, k = c.caso;
+  const an = anonimizar(k.frase);
+  return `<div class="pila-g">
+    <h1 class="titulo">Tu caso</h1>
+    <article class="tarjeta-caso">
+      <div class="chips"><span class="chip chip-lacre">${esc(temaLabel(k.tema))}</span><span class="chip">${esc(regionPublica(k.provincia,k.localidad))}</span><span class="estado ok">Activo</span></div>
+      <p class="frase">${resaltarMarcas(an.texto)}</p>
+      <p class="texto-3">Se borra solo a los 90 días si no hay match.</p>
+    </article>
+    <section class="pila">
+      <h2 class="titulo-chico">Con match</h2>
+      ${c.chats.length ? c.chats.map(ch=>{const a=abogado(ch.abogadoId);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}"><div class="avatar">${a.ini}</div><div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>${esc(ultimo(ch))}</span></div><span class="estado ok">Match</span></button>`}).join('') : '<p class="texto-3">Todavía ninguno.</p>'}
+    </section>
+    <section class="pila">
+      <h2 class="titulo-chico">Esperando respuesta</h2>
+      ${c.pendientes.length ? c.pendientes.map(id=>{const a=abogado(id);return `<div class="item"><div class="avatar">${a.ini}</div><div class="cuerpo"><strong>${esc(a.nombre)}</strong><span>Le avisamos de tu interés</span></div><button class="btn btn-sec" style="min-height:36px;padding:0 12px;font-size:14px" data-action="simular-acepta" data-id="${id}">Simular respuesta</button></div>`}).join('') : '<p class="texto-3">Nadie pendiente.</p>'}
+    </section>
+    <div class="pila">
+      ${c.likes>0 && (c.orden||[]).length>c.indice ? '<button class="btn btn-principal btn-bloque" data-action="ir-mazo">Seguir viendo abogados</button>' : ''}
+      <button class="btn btn-sec btn-bloque" data-action="borrar-caso">Borrar mi caso y mis datos</button>
+    </div>
+  </div>`;
+}
+function vistaSinCaso(){
+  return `<div class="vacio"><h2>Todavía no contaste tu caso</h2><p>Son 5 pasos cortos y no hace falta crear cuenta para empezar.</p>
+    <div style="margin-top:20px"><button class="btn btn-principal btn-bloque" data-action="empezar">Empezar</button></div></div>`;
+}
+
+/* ---------------- Chats (compartido) ---------------- */
+function ultimo(ch){ const m = [...ch.msgs].reverse().find(x=>x.de!=='sistema'); return m ? m.texto : 'Chat abierto'; }
+function contraparteDe(rol, ch){
+  if (rol==='cliente'){ const a = abogado(ch.abogadoId); return {nombre:a.nombre, ini:a.ini, sub:a.corto+' '+a.mat}; }
+  if (rol==='abogado') return {nombre:ch.cliente, ini:'C', sub:ch.compartido?ch.datos:'Identidad sin compartir'};
+  return {nombre:ch.cliente, ini:'C', sub:'Asignado a '+ch.asignado};
+}
+function vistaListaChats(chats, rol){
+  if (!chats.length){
+    const txt = rol==='cliente' ? 'Cuando un abogado y vos se marquen interés, el chat aparece acá.' : 'Cuando una persona y vos se marquen interés, el chat aparece acá.';
+    const btn = rol==='cliente' ? (S.cliente.caso?'<button class="btn btn-principal btn-bloque" data-action="ir-mazo">Ver abogados</button>':'<button class="btn btn-principal btn-bloque" data-action="empezar">Contar mi caso</button>') : `<button class="btn btn-principal btn-bloque" data-action="tab" data-vista="${rol==='abogado'?'casos':'bandeja'}">Ver casos</button>`;
+    return `<div class="vacio"><h2>Sin chats todavía</h2><p>${txt}</p><div style="margin-top:20px">${btn}</div></div>`;
+  }
+  return `<div class="pila"><h1 class="titulo" style="margin-bottom:8px">Chats</h1>${chats.map(ch=>{const o=contraparteDe(rol,ch);return `<button class="item" data-action="abrir-chat" data-id="${ch.id}"><div class="avatar">${esc(o.ini)}</div><div class="cuerpo"><strong>${esc(o.nombre)}</strong><span>${esc(ultimo(ch))}</span></div></button>`}).join('')}</div>`;
+}
+function vistaChat(rol){
+  const st = S[rol];
+  const ch = st.chats.find(x=>x.id===st.chatAbierto);
+  if (!ch) return vistaListaChats(st.chats, rol);
+  const o = contraparteDe(rol, ch);
+  const herramientas = rol==='cliente'
+    ? `${ch.compartido?'':'<button data-action="compartir-datos">Compartir mis datos</button>'}<button data-action="horarios">Ver horarios</button><button data-action="reportar">Reportar</button>`
+    : `<button data-action="horarios">Proponer horario</button><button data-action="presupuesto">Enviar presupuesto</button><button data-action="conflicto">Control de conflictos</button>`;
+  return `<div class="chat">
+    <div class="chat-cab">
+      <button class="volver" data-action="tab" data-vista="chats" aria-label="Volver a chats">‹</button>
+      <div class="avatar">${esc(o.ini)}</div>
+      <div><strong>${esc(o.nombre)}</strong><div class="texto-3">${esc(o.sub)}</div></div>
+    </div>
+    <div class="banner-hon">${rol==='cliente'?'Pedí el presupuesto por escrito antes de empezar. Se paga directo al profesional.':'Enviá el presupuesto por escrito. El honorario no puede ser menor al arancel.'}</div>
+    <div class="mensajes" aria-live="polite">
+      ${ch.msgs.map(m=>`<div class="msg ${m.de===rol||(m.de==='abogado'&&rol==='estudio')?'yo':m.de==='sistema'?'sistema':'otro'}">${esc(m.texto)}</div>`).join('')}
+      ${ch.escribiendo?'<div class="escribiendo">Escribiendo…</div>':''}
+    </div>
+    <div class="herramientas-chat">${herramientas}</div>
+    <form class="composer" data-form="mensaje">
+      <label class="sr" for="msg">Mensaje</label>
+      <input id="msg" autocomplete="off" placeholder="Escribí un mensaje">
+      <button class="btn btn-principal" type="submit">Enviar</button>
+    </form>
+  </div>`;
+}
+
+/* ---------------- Abogado ---------------- */
+function renderAbogado(){
+  const a = S.abogado;
+  if (a.vista==='casos') return a.verificado ? vistaCasosAbogado() : vistaVerificacion();
+  if (a.vista==='chats') return vistaListaChats(a.chats,'abogado');
+  if (a.vista==='chat') return vistaChat('abogado');
+  if (a.vista==='perfil') return vistaPerfilAbogado();
+  return '';
+}
+function vistaVerificacion(){
+  return `<div class="pila-g">
+    <div class="perfil-cab">${seal('CPACF', true)}<div><h1 class="titulo-chico">Estamos verificando tu matrícula</h1><p class="texto-3">Tu perfil no aparece hasta que el colegio la confirme.</p></div></div>
+    <ol class="pasos-verif">
+      <li><span class="marca-paso ok" aria-hidden="true">✓</span><div><strong>Registro</strong><p class="texto-3">Email, DNI, CUIT y matrícula T° 154 F° 233</p></div></li>
+      <li><span class="marca-paso ok" aria-hidden="true">✓</span><div><strong>Identidad</strong><p class="texto-3">Selfie con prueba de vida validada contra RENAPER</p></div></li>
+      <li><span class="marca-paso pend" aria-hidden="true">…</span><div><strong>Matrícula en el colegio</strong><p class="texto-3">Consultando el padrón del CPACF: estado, nombre y sanciones vigentes</p></div></li>
+      <li><span class="marca-paso" aria-hidden="true">4</span><div><strong>Perfil y reglas</strong><p class="texto-3">Especialidades, honorario de consulta y aceptación del código de conducta</p></div></li>
+    </ol>
+    <div class="aviso aviso-info">La matrícula se revalida cada 6 meses. Si el colegio te suspende, el perfil se apaga solo.</div>
+    <button class="btn btn-principal btn-bloque" data-action="aprobar">Simular respuesta del colegio</button>
+  </div>`;
+}
+function vistaCasosAbogado(){
+  const a = S.abogado;
+  const restantes = CASOS.slice(a.indice);
+  const usados = a.ayudados.length;
+  const cupoTotal = a.plan==='pro' ? 20 : 5;
+  const cupoBar = `<div class="cupo"><span>Cupo semanal</span><span class="barra-cupo"><span style="width:${Math.min(100,usados/cupoTotal*100)}%"></span></span><span>${usados} de ${cupoTotal}</span></div>`;
+  if (!restantes.length){
+    return `<div>${cupoBar}<div class="vacio"><h2>No hay más casos por ahora</h2><p>Te avisamos cuando entre un caso de tu jurisdicción y especialidad.</p>${a.chats.length?'<div style="margin-top:20px"><button class="btn btn-principal btn-bloque" data-action="tab" data-vista="chats">Ir a los chats</button></div>':''}</div></div>`;
+  }
+  const k = restantes[0], sig = restantes[1];
+  return `<div>
+    ${cupoBar}
+    <div class="mazo" id="mazo" style="margin-top:12px">
+      ${sig ? cartaCaso(sig, true) : ''}
+      ${cartaCaso(k, false)}
+    </div>
+    <div class="controles-mazo" style="grid-template-columns:1fr 1fr">
+      <button class="btn btn-sec btn-redondo" data-action="pasar">Paso</button>
+      <button class="btn btn-principal btn-redondo" data-action="me-interesa" ${usados>=cupoTotal?'disabled':''}>Puedo ayudar</button>
+    </div>
+    ${usados>=cupoTotal?'<p class="contador-likes">Llegaste al cupo del plan Básico. <button class="btn-texto" data-action="tab" data-vista="perfil">Ver planes</button></p>':''}
+  </div>`;
+}
+function cartaCaso(k, detras){
+  return `<article class="carta${detras?' detras':''}" ${detras?'aria-hidden="true"':'id="carta-actual" tabindex="0" aria-label="Caso de '+esc(k.tema)+'"'}>
+    <span class="etiqueta-swipe si" aria-hidden="true">Puedo ayudar</span>
+    <span class="etiqueta-swipe no" aria-hidden="true" style="right:18px">Paso</span>
+    <div class="chips"><span class="chip chip-lacre">${esc(k.tema)}: ${esc(k.sub)}</span>${k.urgente?'<span class="chip chip-alerta">'+esc(k.plazo)+'</span>':''}</div>
+    <p class="frase" style="font-family:var(--serif);font-size:19px;line-height:1.45;margin:14px 0">${resaltarMarcas(k.frase)}</p>
+    <div class="chips">${k.resp.map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
+    <dl class="datos">
+      <div><dt>Ubicación</dt><dd>${esc(k.region)}</dd></div>
+      <div><dt>Publicado</dt><dd>${esc(k.hace)}</dd></div>
+    </dl>
+    ${k.regionNota?`<p class="texto-3" style="margin-top:8px">${esc(k.regionNota)}</p>`:''}
+    <div style="flex:1"></div>
+    ${k.interesado?'<div class="aviso aviso-ok" style="margin-top:10px">Esta persona ya marcó interés en tu perfil.</div>':''}
+    ${k.sinCuotaLitis?'<div class="aviso aviso-alerta" style="margin-top:10px">Asunto de alimentos: no se permite pacto de cuota litis (Ley 27.423, art. 6).</div>':''}
+    <p class="texto-3" style="margin-top:10px">Este resumen no es una consulta. Verificá conflictos de intereses antes de aceptar.</p>
+  </article>`;
+}
+
+const PALABRAS_PROHIBIDAS = [/garantiz/i,/\bel mejor\b/i,/\bla mejor\b/i,/100\s?%/,/\bgratis\b/i,/ganamos/i,/sin riesgo/i,/aseguro/i,/n[uú]mero uno/i,/indemnizaci[oó]n de \$/i];
+function revisarBio(t){ return PALABRAS_PROHIBIDAS.filter(r=>r.test(t)).map(r=>t.match(r)[0]); }
+function vistaPerfilAbogado(){
+  const a = S.abogado;
+  const minimo = 38000;
+  const hon = parseInt(String(a.honorario).replace(/\D/g,''),10) || 0;
+  const bajo = hon < minimo;
+  const malas = revisarBio(a.bio);
+  return `<div class="pila-g">
+    <div class="perfil-cab">${seal('CPACF', !a.verificado)}<div><h1 class="titulo-chico">Dr. Tomás Aguirre</h1><p class="texto-3">CPACF T° 154 F° 233 · ${a.verificado?'verificada el 20/10/2026':'en verificación'}</p></div></div>
+    <div class="chips"><span class="chip chip-ok">Derecho laboral, comprobada</span><span class="chip">Seguridad social, declarada</span></div>
+    <div class="campo">
+      <label for="hon">Honorario de primera consulta (pesos)</label>
+      <input id="hon" inputmode="numeric" data-input="honorario" value="${esc(a.honorario)}">
+      <p class="ayuda" id="hon-ayuda" style="${bajo?'color:var(--lacre-osc);font-weight:600':''}">${bajo?'Está por debajo del mínimo arancelario de tu jurisdicción. No se puede publicar (Ley 27.423, art. 5).':'Mínimo de ejemplo para la demo: $ 38.000. En producción sale de la ley arancelaria de tu jurisdicción.'}</p>
+    </div>
+    <div class="campo">
+      <label for="bio">Presentación (hasta 500 caracteres)</label>
+      <textarea id="bio" maxlength="500" data-input="bio">${esc(a.bio)}</textarea>
+      <div id="bio-aviso">${malas.length?`<div class="aviso aviso-alerta" style="margin-top:8px">Revisá: ${malas.map(m=>'"'+esc(m)+'"').join(', ')}. No se permiten promesas de resultado, superlativos ni ofertas de gratuidad.</div>`:'<p class="ayuda">Contá cómo trabajás. Sin promesas de resultado ni montos de indemnización.</p>'}</div>
+    </div>
+    <label class="interruptor"><input type="checkbox" data-action="cuota-litis" ${a.cuotaLitis?'checked':''}><span><strong>Acepto pacto de cuota litis</strong><span class="texto-3" style="display:block">Tope 30% del resultado (40% si asumís gastos y costas). No se muestra en asuntos previsionales, de alimentos o con menores representados.</span></span></label>
+    <section class="pila">
+      <h2 class="titulo-chico">Tu plan</h2>
+      <div class="planes">
+        <button class="plan" data-action="plan" data-plan="basico" aria-pressed="${a.plan==='basico'}"><h3>Básico, gratis</h3><ul><li>Perfil verificado</li><li>5 casos por semana</li></ul></button>
+        <button class="plan" data-action="plan" data-plan="pro" aria-pressed="${a.plan==='pro'}"><h3>Profesional, cuota fija mensual</h3><ul><li>20 casos por semana</li><li>Agenda, plantillas de presupuesto y estadísticas de tu perfil</li><li>Precio de beta a definir</li></ul></button>
+      </div>
+      <p class="texto-3">Justa nunca cobra por caso, por contacto ni un porcentaje de tus honorarios.</p>
+    </section>
+    <button class="btn btn-principal btn-bloque" data-action="guardar-perfil">Guardar perfil</button>
+  </div>`;
+}
+
+/* ---------------- Estudio ---------------- */
+function renderEstudio(){
+  const e = S.estudio;
+  if (e.vista==='bandeja') return vistaBandeja();
+  if (e.vista==='equipo') return vistaEquipo();
+  if (e.vista==='chats') return vistaListaChats(e.chats,'estudio');
+  if (e.vista==='chat') return vistaChat('estudio');
+  if (e.vista==='plan') return vistaPlanEstudio();
+  return '';
+}
+function vistaBandeja(){
+  const e = S.estudio;
+  const casos = CASOS.filter(k=>!e.descartados.includes(k.id) && !e.ayudados.includes(k.id));
+  const verificados = e.equipo.filter(m=>m.estado==='ok');
+  return `<div class="pila-g">
+    <div><h1 class="titulo">Torres, Giménez y Asociados</h1><p class="texto-3" style="margin-top:4px">${verificados.length} abogados verificados · ${casos.length} casos en la bandeja</p></div>
+    ${casos.length ? casos.map(k=>{
+      const asig = e.asignaciones[k.id] || '';
+      return `<article class="tarjeta-caso caso-equipo">
+        <div class="chips"><span class="chip chip-lacre">${esc(k.tema)}: ${esc(k.sub)}</span><span class="chip">${esc(k.region)}</span>${k.urgente?'<span class="chip chip-alerta">'+esc(k.plazo)+'</span>':''}${k.interesado?'<span class="chip chip-ok">Marcó interés en el estudio</span>':''}</div>
+        <p class="frase">${resaltarMarcas(k.frase)}</p>
+        ${k.sinCuotaLitis?'<p class="texto-3">Alimentos: sin pacto de cuota litis.</p>':''}
+        <div class="fila">
+          <label class="sr" for="asig-${k.id}">Asignar a</label>
+          <select id="asig-${k.id}" data-input="asignar" data-caso="${k.id}">
+            <option value="">Asignar a…</option>
+            ${e.equipo.map(m=>`<option value="${m.id}" ${m.estado!=='ok'?'disabled':''} ${asig===m.id?'selected':''}>${esc(m.nombre)}${m.estado!=='ok'?' (en verificación)':''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fila">
+          <button class="btn btn-sec" style="flex:1" data-action="estudio-paso" data-id="${k.id}">Paso</button>
+          <button class="btn btn-principal" style="flex:1" data-action="estudio-ayudar" data-id="${k.id}" ${asig?'':'disabled'}>Puedo ayudar</button>
+        </div>
+      </article>`}).join('') : '<div class="vacio"><h2>Bandeja al día</h2><p>No hay casos nuevos para el equipo.</p></div>'}
+  </div>`;
+}
+function vistaEquipo(){
+  const e = S.estudio;
+  return `<div class="pila-g">
+    <div><h1 class="titulo">Equipo</h1><p class="texto-2" style="margin-top:6px">Cada abogado se verifica con su colegio. El estudio muestra siempre quién es responsable de cada caso.</p></div>
+    <div class="pila">
+      ${e.equipo.map(m=>`<div class="item"><div class="avatar">${esc(m.ini)}</div><div class="cuerpo"><strong>${esc(m.nombre)}</strong><span>${esc(m.rol)} · ${esc(m.esp)} · ${esc(m.mat)}</span></div>${m.estado==='ok'?'<span class="estado ok">Verificada</span>':`<button class="btn btn-sec" style="min-height:36px;padding:0 10px;font-size:13px" data-action="aprobar-miembro" data-id="${m.id}">Simular verificación</button>`}</div>`).join('')}
+    </div>
+    <form class="pila" data-form="invitar">
+      <h2 class="titulo-chico">Invitar a un abogado</h2>
+      <div class="campo"><label for="inv-nombre">Nombre y apellido</label><input id="inv-nombre" required placeholder="Dr. Julián Paz"></div>
+      <div class="campo"><label for="inv-mat">Colegio y matrícula</label><input id="inv-mat" required placeholder="CPACF T° 150 F° 45"></div>
+      <button class="btn btn-sec btn-bloque" type="submit">Enviar invitación</button>
+    </form>
+  </div>`;
+}
+function vistaPlanEstudio(){
+  const n = S.estudio.equipo.filter(m=>m.estado==='ok').length;
+  return `<div class="pila-g">
+    <h1 class="titulo">Plan del estudio</h1>
+    <article class="plan" aria-pressed="true"><h3>Estudio, cuota fija por abogado</h3><ul><li>${n} ${n===1?'asiento activo':'asientos activos'} (solo abogados verificados)</li><li>Bandeja compartida, asignación de casos y agenda del equipo</li><li>Precio de beta a definir</li></ul></article>
+    <div class="aviso aviso-lacre">Justa no cobra comisión por caso, pago por contacto ni porcentaje de honorarios. Tampoco vende posiciones destacadas.</div>
+    <div class="pie-legal">Los planes pagos se pueden cancelar con el <button class="boton-legal" data-action="legal" data-doc="baja">Botón de baja</button> y revocar dentro de los 10 días con el <button class="boton-legal" data-action="legal" data-doc="arrep">Botón de arrepentimiento</button>.</div>
+  </div>`;
+}
+
+/* =========================================================
+   Hojas (modales)
+   ========================================================= */
+function abrirHoja(html, centro){
+  $('#capa').innerHTML = `<div class="capa ${centro?'hoja-centro':''}" data-action="cerrar-fondo"><div class="hoja" role="dialog" aria-modal="true">${html}</div></div>`;
+  const f = $('#capa').querySelector('button, input'); if (f) f.focus();
+}
+function cerrarHoja(){ $('#capa').innerHTML=''; }
+function cabHoja(t){ return `<div class="hoja-cab"><h2 class="titulo-chico">${t}</h2><button class="cerrar" data-action="cerrar" aria-label="Cerrar">×</button></div>`; }
+
+function hojaPerfil(id){
+  const a = abogado(id);
+  const dims = ['Claridad para explicar','Trato','Tiempos de respuesta','Cumplimiento de lo acordado'];
+  abrirHoja(`${cabHoja(esc(a.nombre))}
+    <div class="pila-g" style="margin-top:12px">
+      <div class="perfil-cab">${seal(a.corto)}<div><strong>Matrícula verificada</strong><p class="texto-3">${esc(a.colegio)}<br>${esc(a.mat)} · verificada el ${a.verif}</p></div></div>
+      <div><h3 style="font-size:17px;margin-bottom:6px">Especialidades</h3><div class="chips">${a.esp.map(([n,c])=>`<span class="chip ${c?'chip-ok':''}">${esc(n)}: ${c?'comprobada':'declarada'}</span>`).join('')}</div></div>
+      <p>${esc(a.bio)}</p>
+      <dl class="datos"><div><dt>Modalidad</dt><dd>${esc(a.modo)}</dd></div><div><dt>Primera consulta</dt><dd>${a.consulta}, pago directo</dd></div><div><dt>Jurisdicción</dt><dd>${esc(a.juris)}</dd></div><div><dt>Años de matrícula</dt><dd>${a.anios}</dd></div></dl>
+      <div class="pila"><h3 style="font-size:17px">Reputación (${a.resenas} reseñas verificadas)</h3>
+        ${dims.map((d,i)=>`<div class="barra-rep"><span>${d}</span><span class="pista"><span style="width:${a.rep[i]/5*100}%"></span></span><strong>${a.rep[i].toFixed(1).replace('.',',')}</strong></div>`).join('')}
+      </div>
+      <div class="pila">${RESENAS.map(([t,r])=>`<div class="resena">${esc(t)}${r?`<div class="replica">Réplica: ${esc(r)}</div>`:''}</div>`).join('')}</div>
+      <div class="aviso aviso-info"><strong>Lo que no vas a ver en ningún perfil</strong><ul class="lista-no"><li>Porcentaje de juicios ganados</li><li>Montos obtenidos en otros casos</li><li>Nombres de clientes o detalles de sus casos</li></ul></div>
+    </div>`);
+}
+function hojaMatch(id, rol){
+  const a = rol==='cliente' ? abogado(id) : null;
+  const nombre = a ? a.nombre : id;
+  const iniA = a ? a.ini : 'C';
+  const iniB = rol==='cliente' ? 'Vos' : (rol==='estudio'?'TG':'TA');
+  abrirHoja(`<div class="match pila-g">
+    <div class="pareja"><div class="avatar">${esc(iniA)}</div><div class="avatar" style="font-size:${iniB.length>2?'18px':'24px'}">${esc(iniB)}</div></div>
+    <h2>Hay match</h2>
+    <p class="texto-2">${rol==='cliente' ? esc(nombre)+' puede ayudarte con tu caso.' : 'Esta persona también te eligió. Ya pueden hablar.'}</p>
+    <div class="aviso aviso-lacre" style="text-align:left">${rol==='cliente'?'Justa no es tu abogado. El acuerdo de honorarios lo firmás directamente con el profesional.':'El contrato y los honorarios se pactan por escrito y en forma directa con el cliente. Verificá conflictos de intereses antes de aceptar.'}</div>
+    <div class="pila"><button class="btn btn-principal btn-bloque" data-action="ir-chat-match">Abrir chat</button><button class="btn btn-sec btn-bloque" data-action="cerrar">${rol==='cliente'?'Seguir viendo abogados':'Seguir viendo casos'}</button></div>
+  </div>`, true);
+}
+const LEGALES = {
+  tyc:['Términos (resumen de la beta)','<ol style="padding-left:20px;margin:12px 0 0"><li>Justa es un directorio calificado y una herramienta de contacto. No presta servicios jurídicos ni es parte del contrato profesional.</li><li>El contrato y los honorarios se pactan por escrito y en forma directa entre cliente y abogado.</li><li>Justa no cobra porcentaje de honorarios ni pagos por caso, contacto o resultado.</li><li>El abogado acepta o rechaza casos con total libertad.</li><li>El resumen anonimizado no es una consulta ni genera relación profesional.</li><li>Justa no atiende emergencias.</li></ol>'],
+  priv:['Privacidad (resumen de la beta)','<p style="margin-top:12px">Tratamos tus datos según la Ley 25.326. El texto original de tu caso se guarda cifrado y separado del resumen que ven los abogados. Podés pedir acceso, corrección o borrado en cualquier momento, y los casos sin match se borran a los 90 días. Podés reclamar ante la Agencia de Acceso a la Información Pública.</p>'],
+  arrep:['Botón de arrepentimiento','<p style="margin-top:12px">Si contrataste un plan pago, podés revocar la contratación dentro de los 10 días, sin registrarte de nuevo ni dar explicaciones (Ley 24.240, art. 34; Disposición 954/2025). En la beta, este botón es una demostración.</p>'],
+  baja:['Botón de baja','<p style="margin-top:12px">Podés dar de baja tu plan desde acá, en cualquier momento y por el mismo medio por el que lo contrataste. En la beta, este botón es una demostración.</p>']
+};
+
+/* =========================================================
+   Acciones
+   ========================================================= */
+const acciones = {
+  rol: d => { S.rol = d.rol; cerrarHoja(); const tt=document.querySelector('.toast'); if(tt) tt.remove(); render(); $('#pantalla').scrollTop=0; },
+  reiniciar: () => { S = estadoInicial(); cerrarHoja(); render(); toast('Demo reiniciada'); },
+  tab: d => { const st=S[S.rol]; st.vista=d.vista; if(d.vista==='chats') st.chatAbierto=null; cerrarHoja(); render(); $('#pantalla').scrollTop=0; },
+  cerrar: () => cerrarHoja(),
+  'cerrar-fondo': (d, ev) => { if (ev.target.classList.contains('capa')) cerrarHoja(); },
+  legal: d => { const l = LEGALES[d.doc]; abrirHoja(cabHoja(l[0]) + l[1]); },
+  'como-verificamos': () => abrirHoja(cabHoja('Cómo verificamos') + '<ol style="padding-left:20px;margin:12px 0 0"><li>Identidad: selfie con prueba de vida y DNI validado contra RENAPER.</li><li>Matrícula: número, estado activo y nombre contra el padrón del colegio de cada jurisdicción.</li><li>Sanciones: que no tenga suspensión ni exclusión vigente.</li><li>Revalidación cada 6 meses y ante cualquier denuncia.</li></ol>'),
+  'por-que': () => abrirHoja(cabHoja('Por qué ves estos abogados') + '<ul style="padding-left:20px;margin:12px 0 0"><li>Tienen matrícula activa y verificada.</li><li>Atienden casos de tu tema.</li><li>Tienen disponibilidad esta semana.</li><li>Entre perfiles parecidos, el orden es al azar. Nadie paga para aparecer primero.</li></ul>'),
+
+  urgente: () => { S.cliente.borrador = nuevoBorrador(); S.cliente.vista='urgente'; render(); },
+  'urgente-seguir': () => { S.cliente.vista='preview'; render(); },
+  empezar: d => { const c=S.cliente; c.borrador=nuevoBorrador(); if(d.tema){c.borrador.tema=d.tema;c.paso=1;}else c.paso=0; c.vista='wizard'; render(); $('#pantalla').scrollTop=0; },
+  'elegir-tema': d => { const b=S.cliente.borrador; if(b.tema!==d.tema) b.resp=[null,null]; b.tema=d.tema; render(); },
+  'elegir-resp': d => { S.cliente.borrador.resp[+d.i]=d.valor; render(); },
+  'elegir-plazo': d => { S.cliente.borrador.plazo=d.valor; render(); },
+  'elegir-abogado': d => { S.cliente.borrador.tieneAbogado=d.valor; render(); },
+  'wiz-atras': () => { const c=S.cliente; if(c.paso===0){c.vista='inicio';} else c.paso--; render(); $('#pantalla').scrollTop=0; },
+  'wiz-sig': () => {
+    const c=S.cliente;
+    if (c.paso<4){ c.paso++; render(); $('#pantalla').scrollTop=0; return; }
+    c.vista = esUrgente(c.borrador) ? 'urgente' : 'preview';
+    render(); $('#pantalla').scrollTop=0;
+  },
+  'editar-frase': () => { S.cliente.paso=2; S.cliente.vista='wizard'; render(); },
+  consent: d => { const c=S.cliente; if(d.cual==='sens') c.consentSens=!c.consentSens; else c.consentTyc=!c.consentTyc; const b=$('#btn-codigo'); if(b) b.disabled=!(c.consentSens&&c.consentTyc); },
+  'enviar-codigo': () => {
+    abrirHoja(`${cabHoja('Ingresá el código')}<form class="pila-g" data-form="otp" style="margin-top:12px">
+      <p class="texto-2">Te lo mandamos por SMS o WhatsApp. En la demo, el código es <strong>2026</strong>.</p>
+      <div class="campo"><label for="otp">Código</label><input id="otp" inputmode="numeric" maxlength="4" autocomplete="one-time-code"></div>
+      <button class="btn btn-principal btn-bloque" type="submit">Verificar y ver abogados</button></form>`);
+  },
+  'ir-mazo': () => { S.cliente.vista='mazo'; render(); },
+  'ver-perfil': d => hojaPerfil(d.id),
+  'me-interesa': () => salirCarta(1),
+  pasar: () => salirCarta(-1),
+  'simular-acepta': d => {
+    const c=S.cliente; c.pendientes=c.pendientes.filter(x=>x!==d.id);
+    crearChatCliente(d.id); render(); hojaMatch(d.id,'cliente');
+  },
+  'ir-chat-match': () => { cerrarHoja(); const st=S[S.rol]; st.vista='chat'; render(); },
+  'abrir-chat': d => { const st=S[S.rol]; st.chatAbierto=d.id; st.vista='chat'; render(); },
+  'borrar-caso': () => abrirHoja(`${cabHoja('¿Borrar tu caso?')}<div class="pila-g" style="margin-top:12px"><p class="texto-2">Se borran el resumen, el texto original y los chats. No se puede deshacer.</p><button class="btn btn-principal btn-bloque" data-action="confirmar-borrar">Borrar todo</button><button class="btn btn-sec btn-bloque" data-action="cerrar">Cancelar</button></div>`),
+  'confirmar-borrar': () => { const c=S.cliente; Object.assign(c,{caso:null,pendientes:[],chats:[],chatAbierto:null,likes:5,indice:0,orden:null,vista:'inicio',consentSens:false,consentTyc:false}); cerrarHoja(); render(); toast('Borramos tu caso y tus datos'); },
+  'compartir-datos': () => abrirHoja(`${cabHoja('Compartir tus datos')}<div class="pila-g" style="margin-top:12px"><p>Le vas a mostrar tu nombre y tu celular a este abogado.</p><div class="aviso aviso-lacre">Lo que le cuentes al abogado está protegido por el secreto profesional. A Justa no le hace falta saberlo.</div><div class="campo"><label for="contraparte">Nombre de la otra parte (opcional)</label><input id="contraparte" placeholder="Por ejemplo, la empresa o la persona"></div><p class="ayuda">Solo lo ve este abogado, para controlar que no la represente.</p><button class="btn btn-principal btn-bloque" data-action="confirmar-compartir">Compartir</button></div>`),
+  'confirmar-compartir': () => {
+    const c=S.cliente, ch=c.chats.find(x=>x.id===c.chatAbierto);
+    const cp = ($('#contraparte')||{}).value || '';
+    ch.compartido=true; ch.msgs.push({de:'sistema',texto:'Compartiste tu nombre y tu celular'+(cp?' y el nombre de la otra parte':'')+' con este abogado.'});
+    cerrarHoja(); render(); responder('cliente', ch);
+  },
+  horarios: () => abrirHoja(`${cabHoja(S.rol==='cliente'?'Horarios disponibles':'Proponer horario')}<div class="pila" style="margin-top:12px">${HORARIOS.map(h=>`<button class="opcion" data-action="elegir-horario" data-h="${esc(h)}">${esc(h)}</button>`).join('')}</div>`),
+  'elegir-horario': d => { const st=S[S.rol], ch=st.chats.find(x=>x.id===st.chatAbierto); ch.msgs.push({de:'sistema',texto:'Primera consulta agendada: '+d.h+'.'}); cerrarHoja(); render(); toast('Consulta agendada'); },
+  presupuesto: () => { const st=S[S.rol], ch=st.chats.find(x=>x.id===st.chatAbierto); ch.msgs.push({de:'abogado',texto:'Te envío el presupuesto por escrito: primera consulta $ 45.000. Si avanzamos, firmamos un convenio de honorarios antes de iniciar cualquier trámite.'}); render(); responder(S.rol, ch); },
+  conflicto: () => { const st=S[S.rol], ch=st.chats.find(x=>x.id===st.chatAbierto); ch.msgs.push({de:'sistema',texto:ch.compartido?'Control de conflictos: no representás a la otra parte. Podés avanzar.':'El cliente todavía no compartió el nombre de la otra parte. Pedíselo antes de aceptar el caso.'}); render(); },
+  reportar: () => { toast('Reporte enviado. Lo revisa una persona del equipo.'); },
+  aprobar: () => { S.abogado.verificado=true; render(); toast('El colegio confirmó tu matrícula. Ya podés ver casos.'); },
+  'cuota-litis': () => { S.abogado.cuotaLitis=!S.abogado.cuotaLitis; },
+  plan: d => { S.abogado.plan=d.plan; render(); },
+  'guardar-perfil': () => {
+    const a=S.abogado; const hon=parseInt(String(a.honorario).replace(/\D/g,''),10)||0;
+    if (hon<38000){ toast('No se guardó: el honorario está por debajo del mínimo.'); return; }
+    if (revisarBio(a.bio).length){ toast('No se guardó: revisá la presentación.'); return; }
+    toast('Perfil guardado');
+  },
+  'estudio-paso': d => { S.estudio.descartados.push(d.id); render(); },
+  'estudio-ayudar': d => {
+    const e=S.estudio, k=CASOS.find(x=>x.id===d.id), m=e.equipo.find(x=>x.id===e.asignaciones[d.id]);
+    e.ayudados.push(d.id);
+    if (k.interesado){
+      const ch={id:'e'+d.id,cliente:k.cliente,asignado:m.nombre,compartido:false,msgs:[{de:'sistema',texto:'Match con el estudio. Abogada o abogado responsable: '+m.nombre+'.'}]};
+      e.chats.unshift(ch); e.chatAbierto=ch.id; render(); hojaMatch(k.cliente,'estudio');
+    } else { render(); toast('Le avisamos a la persona que '+m.nombre+' puede ayudar.'); }
+  },
+  'aprobar-miembro': d => { const m=S.estudio.equipo.find(x=>x.id===d.id); m.estado='ok'; render(); toast(m.nombre+' quedó verificada con su colegio.'); }
+};
+
+function crearChatCliente(id){
+  const c=S.cliente, a=abogado(id);
+  const ch={id:'ch'+id, abogadoId:id, compartido:false, msgs:[{de:'sistema',texto:'Match con '+a.nombre+'. Tu identidad sigue oculta hasta que la compartas.'},{de:'abogado',texto:RESP_ABOGADO[0]}]};
+  c.chats.unshift(ch); c.chatAbierto=ch.id;
+}
+
+function salirCarta(dir){
+  const carta = $('#carta-actual'); if (!carta) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  carta.style.transform = `translateX(${dir*520}px) rotate(${dir*18}deg)`; carta.style.opacity='0';
+  setTimeout(()=> decidir(dir), reduce ? 0 : 200);
+}
+function decidir(dir){
+  if (S.rol==='cliente'){
+    const c=S.cliente, id=c.orden[c.indice]; c.indice++;
+    if (dir>0){
+      c.likes--;
+      const a=abogado(id);
+      if (a.acepta){ crearChatCliente(id); render(); hojaMatch(id,'cliente'); return; }
+      c.pendientes.push(id); render(); toast('Le avisamos a '+a.nombre+'. Si puede ayudarte, se abre el chat.'); return;
+    }
+    render(); return;
+  }
+  if (S.rol==='abogado'){
+    const a=S.abogado, k=CASOS[a.indice]; a.indice++;
+    if (dir>0){
+      a.ayudados.push(k.id);
+      if (k.interesado){
+        const ch={id:'ab'+k.id, cliente:k.cliente, compartido:false, datos:'', msgs:[{de:'sistema',texto:'Match. La persona todavía no compartió su identidad.'},{de:'cliente',texto:RESP_CLIENTE[0]}]};
+        a.chats.unshift(ch); a.chatAbierto=ch.id; render(); hojaMatch(k.cliente,'abogado'); return;
+      }
+      render(); toast('Le avisamos a la persona. Si te elige, se abre el chat.'); return;
+    }
+    render();
+  }
+}
+
+function responder(rol, ch){
+  const otro = rol==='cliente' ? 'abogado' : 'cliente';
+  const lista = rol==='cliente' ? RESP_ABOGADO : RESP_CLIENTE;
+  const n = ch.msgs.filter(m=>m.de===otro).length;
+  if (n >= lista.length) return;
+  ch.escribiendo = true; render();
+  setTimeout(()=>{
+    ch.escribiendo=false;
+    ch.msgs.push({de:otro, texto:lista[n]});
+    if (rol==='abogado' || rol==='estudio'){ /* sin cambios extra */ }
+    if (S.rol===rol && S[rol].vista==='chat') render();
+  }, 1200);
+}
+
+/* =========================================================
+   Eventos
+   ========================================================= */
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-action]'); if (!t) return;
+  const fn = acciones[t.dataset.action]; if (!fn) return;
+  if (t.tagName==='INPUT' && t.type==='checkbox'){ fn(t.dataset, ev); return; }
+  if (t.dataset.action==='cerrar-fondo'){ fn(t.dataset, ev); return; }
+  ev.preventDefault(); fn(t.dataset, ev);
+});
+
+document.addEventListener('input', ev => {
+  const t = ev.target, k = t.dataset.input; if (!k) return;
+  if (S.rol==='cliente'){
+    const b=S.cliente.borrador;
+    if (k==='frase'){ b.frase=t.value; const cont=$('#cont'); if(cont) cont.textContent=t.value.length; const s=$('#btn-sig'); if(s) s.disabled=t.value.trim().length<10; }
+    if (k==='localidad') b.localidad=t.value;
+    if (k==='tel') S.cliente.tel=t.value;
+  }
+  if (S.rol==='abogado'){
+    const a=S.abogado;
+    if (k==='honorario'){ a.honorario=t.value; const hon=parseInt(t.value.replace(/\D/g,''),10)||0; const ay=$('#hon-ayuda'); if(ay){ const bajo=hon<38000; ay.style.color=bajo?'var(--lacre-osc)':''; ay.style.fontWeight=bajo?'600':''; ay.textContent=bajo?'Está por debajo del mínimo arancelario de tu jurisdicción. No se puede publicar (Ley 27.423, art. 5).':'Mínimo de ejemplo para la demo: $ 38.000. En producción sale de la ley arancelaria de tu jurisdicción.'; } }
+    if (k==='bio'){ a.bio=t.value; const malas=revisarBio(t.value); $('#bio-aviso').innerHTML = malas.length?`<div class="aviso aviso-alerta" style="margin-top:8px">Revisá: ${malas.map(m=>'"'+esc(m)+'"').join(', ')}. No se permiten promesas de resultado, superlativos ni ofertas de gratuidad.</div>`:'<p class="ayuda">Contá cómo trabajás. Sin promesas de resultado ni montos de indemnización.</p>'; }
+  }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target, k = t.dataset.input; if (!k) return;
+  if (k==='provincia'){ S.cliente.borrador.provincia=t.value; const s=$('#btn-sig'); if(s) s.disabled=!t.value; }
+  if (k==='asignar'){ S.estudio.asignaciones[t.dataset.caso]=t.value; render(); }
+});
+document.addEventListener('submit', ev => {
+  const f = ev.target.closest('[data-form]'); if (!f) return;
+  ev.preventDefault();
+  if (f.dataset.form==='otp'){
+    const v = $('#otp').value.trim();
+    if (v!=='2026'){ toast('El código no coincide. En la demo es 2026.'); return; }
+    const c=S.cliente;
+    c.caso = {...c.borrador};
+    c.orden = ordenJusto(c.caso.tema); c.indice=0; c.likes=5; c.pendientes=[];
+    cerrarHoja(); c.vista='mazo'; render(); $('#pantalla').scrollTop=0;
+    toast('Teléfono verificado. Tu caso está publicado sin datos personales.');
+  }
+  if (f.dataset.form==='mensaje'){
+    const inp = $('#msg'); const txt = inp.value.trim(); if (!txt) return;
+    const rol=S.rol, st=S[rol], ch=st.chats.find(x=>x.id===st.chatAbierto);
+    ch.msgs.push({de: rol==='cliente'?'cliente':'abogado', texto: txt});
+    render(); responder(rol==='estudio'?'abogado':rol, ch);
+    const nuevo=$('#msg'); if(nuevo) nuevo.focus();
+  }
+  if (f.dataset.form==='invitar'){
+    const n=$('#inv-nombre').value.trim(), m=$('#inv-mat').value.trim();
+    const ini = n.replace(/^(Dra?\.)\s*/,'').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase();
+    S.estudio.equipo.push({id:'m'+Date.now(),nombre:n,ini:ini||'AB',rol:'Asociado',mat:m,esp:'A completar',estado:'pend'});
+    render(); toast('Invitación enviada. Va a aparecer cuando su colegio confirme la matrícula.');
+  }
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key==='Escape' && $('#capa').innerHTML) { cerrarHoja(); return; }
+  if ($('#capa').innerHTML) return;
+  if (!$('#carta-actual')) return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if (ev.key==='ArrowRight') salirCarta(1);
+  if (ev.key==='ArrowLeft') salirCarta(-1);
+});
+
+/* Deslizar con el dedo o el mouse */
+function activarMazo(){
+  const carta = $('#carta-actual'); if (!carta) return;
+  let x0=0, dx=0, activo=false;
+  const si = carta.querySelector('.etiqueta-swipe.si'), no = carta.querySelector('.etiqueta-swipe.no');
+  carta.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; activo=true; x0=e.clientX; dx=0; carta.setPointerCapture(e.pointerId); carta.style.transition='none'; });
+  carta.addEventListener('pointermove', e => {
+    if (!activo) return; dx = e.clientX - x0;
+    carta.style.transform = `translateX(${dx}px) rotate(${dx/22}deg)`;
+    si.style.opacity = Math.max(0, Math.min(1, dx/90)); no.style.opacity = Math.max(0, Math.min(1, -dx/90));
+  });
+  const fin = () => {
+    if (!activo) return; activo=false; carta.style.transition='';
+    if (dx>100) salirCarta(1); else if (dx<-100) salirCarta(-1);
+    else { carta.style.transform=''; si.style.opacity=0; no.style.opacity=0; }
+  };
+  carta.addEventListener('pointerup', fin); carta.addEventListener('pointercancel', fin);
+}
+
+render();
+</script>
+</body>
+</html>
